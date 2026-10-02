@@ -303,7 +303,7 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, o
                   </span>
                 </div>
                 <div className="text-xs font-mono space-y-1 text-[#0E241E]/90 pt-1">
-                  <p>Document ID: <strong className="bg-white px-1.5 py-0.5 rounded border border-[#0E241E]">{publishedResult.docId}</strong></p>
+                  <p className="flex items-center gap-1.5 flex-wrap"><span>Document ID:</span> <strong className="bg-white px-1.5 py-0.5 rounded border border-[#0E241E] select-all">{publishedResult.docId}</strong></p>
                   <p>Title: <strong>{publishedResult.title}</strong></p>
                   <p>Active Verified Claims: <strong>{publishedResult.claimsCount}</strong></p>
                 </div>
