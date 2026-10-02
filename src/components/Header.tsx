@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Compass, BookOpen, Award, Globe, Radio, Flame, ArrowRight, Plus } from 'lucide-react';
+import { Shield, Compass, BookOpen, Award, Globe, Radio, Flame, Plus } from 'lucide-react';
 import type { SystemStatusResponse, SanityConfigResponse } from '../types.ts';
 import type { TabId } from '../App.tsx';
 
@@ -76,16 +76,20 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all cursor-pointer border-2 border-[#0E241E] font-display ${
+                  className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-[11px] lg:text-xs font-bold uppercase tracking-wide transition-all cursor-pointer border-2 border-[#0E241E] font-display shrink-0 ${
                     active
-                      ? 'bg-[#DE4B39] text-white shadow-[3px_3px_0_#0E241E] -translate-y-px'
-                      : 'bg-[#FAF7F2] text-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:bg-white hover:-translate-y-px hover:shadow-[3px_3px_0_#0E241E]'
+                      ? 'bg-[#DE4B39] text-white shadow-[2px_2px_0_#0E241E] -translate-y-0.5'
+                      : 'bg-white text-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:bg-[#F3ECE0] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#0E241E]'
                   }`}
                 >
                   <Icon className={`w-3.5 h-3.5 stroke-[2.2] ${active ? 'text-white' : 'text-[#0E241E]'}`} />
                   <span>{label}</span>
                   {id === 'console' && (
-                    <span className={`text-[10px] font-mono px-1.5 rounded-full border border-[#0E241E] ${active ? 'bg-[#0E241E] text-white' : 'bg-[#DE4B39] text-white'}`}>
+                    <span
+                      className={`text-[9.5px] font-mono px-1.5 py-0.2 rounded-full border border-[#0E241E] ${
+                        active ? 'bg-white text-[#0E241E]' : 'bg-[#DE4B39] text-white'
+                      }`}
+                    >
                       {investigationCount}
                     </span>
                   )}
