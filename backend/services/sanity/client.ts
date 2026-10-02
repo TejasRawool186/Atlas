@@ -240,7 +240,7 @@ export class SanityClient {
     if (this.cfg.isConfigured && this.cfg.projectId && this.cfg.apiToken) {
       try {
         const mutateUrl = `https://${this.cfg.projectId}.api.sanity.io/v${this.cfg.apiVersion}/data/mutate/${this.cfg.dataset}`;
-        
+
         const mutations: any[] = [
           {
             createOrReplace: {
