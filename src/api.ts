@@ -115,6 +115,7 @@ export const api = {
       entity: any;
       claims: any[];
       liveSanityCreated: boolean;
+      liveSanityError?: string | null;
       suggestedQuestions: string[];
     }>('/api/sanity/ingest-url', {
       method: 'POST',
@@ -137,6 +138,7 @@ export const api = {
       entity: any;
       claims: any[];
       liveSanityCreated: boolean;
+      liveSanityError?: string | null;
       suggestedQuestions: string[];
     }>('/api/sanity/topic', {
       method: 'POST',
