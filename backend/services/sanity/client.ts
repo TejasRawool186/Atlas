@@ -5,8 +5,7 @@
  */
 
 import { atlasConfig } from '../../config/env.ts';
-import { corpusEngine } from './corpus.ts';
-import {
+import { corpusEngine } from './corpus.ts';import {
   SanitySchemaDefinition,
   SanityEntity,
   SanityClaim,
@@ -38,6 +37,7 @@ export class SanityClient {
    * Returns config metadata safe for the API response (no tokens).
    */
   public getPublicMetadata() {
+    const corpusStats = corpusEngine.getStats();
     return {
       projectId: this.cfg.projectId || '(not configured)',
       dataset: this.cfg.dataset,
@@ -47,6 +47,7 @@ export class SanityClient {
       publicDatasetUrl: this.cfg.projectId
         ? `https://${this.cfg.projectId}.api.sanity.io/v${this.cfg.apiVersion}/data/query/${this.cfg.dataset}`
         : null,
+      corpusStats,
     };
   }
 
