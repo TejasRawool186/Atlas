@@ -80,6 +80,70 @@ export const api = {
       body: JSON.stringify({ groq }),
     }),
 
+  extractFromUrl: (payload: { url: string; title?: string; docType?: string; author?: string }) =>
+    request<{
+      success: boolean;
+      article: {
+        title: string;
+        docType: string;
+        sourceUrl: string;
+        author: string;
+        publishedAt: string;
+        summary: string;
+        content: string;
+        extractedClaims: string[];
+        suggestedQuestions: string[];
+      };
+    }>('/api/sanity/extract-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  ingestFromUrl: (payload: {
+    url: string;
+    title?: string;
+    docType?: string;
+    author?: string;
+    summary?: string;
+    content?: string;
+    extractedClaims?: string[];
+  }) =>
+    request<{
+      success: boolean;
+      document: any;
+      entity: any;
+      claims: any[];
+      liveSanityCreated: boolean;
+      suggestedQuestions: string[];
+    }>('/api/sanity/ingest-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  createTopic: (payload: {
+    title: string;
+    docType?: string;
+    author?: string;
+    summary: string;
+    content?: string;
+    extractedClaims?: string[];
+    sourceUrl?: string;
+  }) =>
+    request<{
+      success: boolean;
+      document: any;
+      entity: any;
+      claims: any[];
+      liveSanityCreated: boolean;
+      suggestedQuestions: string[];
+    }>('/api/sanity/topic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
   // ── SSE Event Stream ──────────────────────────────────────────────────────
   subscribeToInvestigationEvents: (
     id: string,
