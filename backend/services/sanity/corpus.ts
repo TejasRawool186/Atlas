@@ -743,6 +743,91 @@ export class SanityCorpusEngine {
     };
   }
 
+  /**
+   * Dynamically adds a new knowledge document, source, and derived entity & claims
+   * into the local corpus engine so they are immediately queryable via GROQ and the agent.
+   */
+  public addKnowledgeDoc(doc: {
+    title: string;
+    docType: string;
+    sourceUrl: string;
+    publishedAt?: string;
+    author: string;
+    summary: string;
+    content?: string;
+    extractedClaims?: string[];
+  }): { doc: SanityKnowledgeDoc; entity: SanityEntity; claims: SanityClaim[]; source: SanitySource } {
+    const slug = doc.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30);
+    const docId = `kdoc-${Date.now().toString(36)}-${slug}`;
+    const entityId = `e-${Date.now().toString(36)}-${slug}`;
+    const sourceId = `src-${Date.now().toString(36)}-${slug}`;
+
+    const newSource: SanitySource = {
+      _id: sourceId,
+      _type: 'source',
+      title: doc.title,
+      url: doc.sourceUrl || 'https://atlas.local/sourced-doc',
+      publisher: doc.author,
+      publishedAt: doc.publishedAt || new Date().toISOString(),
+      sourceType: doc.docType === 'technical_rfc' ? 'rfcs' : 'documentation',
+      author: doc.author,
+      excerpt: doc.summary.slice(0, 200),
+    };
+    this.sources.set(sourceId, newSource);
+
+    const newEntity: SanityEntity = {
+      _id: entityId,
+      _type: 'entity',
+      name: doc.title,
+      entityType: 'standard',
+      description: doc.summary,
+      aliases: [slug],
+      relatedEntities: [],
+    };
+    this.entities.set(entityId, newEntity);
+
+    const createdClaims: SanityClaim[] = [];
+    if (doc.extractedClaims && doc.extractedClaims.length > 0) {
+      doc.extractedClaims.forEach((claimStmt, idx) => {
+        const claimId = `claim-${Date.now().toString(36)}-${idx}`;
+        const newClaim: SanityClaim = {
+          _id: claimId,
+          _type: 'claim',
+          statement: claimStmt,
+          subject: { _type: 'reference', _ref: entityId },
+          predicate: 'stipulates',
+          object: claimStmt,
+          sources: [{ _type: 'reference', _ref: sourceId }],
+          validFrom: doc.publishedAt || new Date().toISOString(),
+          status: 'active',
+          confidence: 'high',
+        };
+        this.claims.set(claimId, newClaim);
+        createdClaims.push(newClaim);
+      });
+    }
+
+    const validDocTypes = ['release_notes', 'architecture_spec', 'changelog', 'technical_rfc', 'security_advisory'];
+    const safeDocType = (validDocTypes.includes(doc.docType) ? doc.docType : 'technical_rfc') as SanityKnowledgeDoc['docType'];
+
+    const newDoc: SanityKnowledgeDoc = {
+      _id: docId,
+      _type: 'knowledge_doc',
+      title: doc.title,
+      docType: safeDocType,
+      sourceUrl: doc.sourceUrl || 'https://atlas.local/sourced-doc',
+      publishedAt: doc.publishedAt || new Date().toISOString(),
+      author: doc.author,
+      summary: doc.summary,
+      content: doc.content || doc.summary,
+      extractedClaims: doc.extractedClaims || [],
+      referencedEntities: [entityId],
+    };
+    this.knowledgeDocs.set(docId, newDoc);
+
+    return { doc: newDoc, entity: newEntity, claims: createdClaims, source: newSource };
+  }
+
   executeGroq(groq: string, params: Record<string, any> = {}): any {
     const q = groq.trim();
     if (q.includes('"entity"')) {
