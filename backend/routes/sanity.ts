@@ -48,6 +48,12 @@ sanityRouter.get('/sources', (_req: Request, res: Response) => {
   res.json({ sources });
 });
 
+// GET /api/sanity/stats — corpus document counts per type
+sanityRouter.get('/stats', (_req: Request, res: Response) => {
+  const stats = corpusEngine.getStats();
+  res.json({ stats, mode: sanityClient.getConnectionStatus().mode });
+});
+
 // POST /api/sanity/query — GROQ query endpoint
 sanityRouter.post('/query', async (req: Request, res: Response) => {
   const { groq, params } = req.body as { groq?: string; params?: Record<string, unknown> };
