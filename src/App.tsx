@@ -4,12 +4,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header.tsx';
+import { LandingPage } from './components/LandingPage.tsx';
 import { InvestigationConsole } from './components/InvestigationConsole.tsx';
 import { EvidenceGraph } from './components/EvidenceGraph.tsx';
 import { AuditMatrix } from './components/AuditMatrix.tsx';
 import { CertificateVerifier } from './components/CertificateVerifier.tsx';
 import { SanityExplorer } from './components/SanityExplorer.tsx';
 import { ArchitectureView } from './components/ArchitectureView.tsx';
+import { AddTopicModal } from './components/AddTopicModal.tsx';
 import { api } from './api.ts';
 import type {
   InvestigationSummary,
@@ -21,10 +23,12 @@ import type {
   SanityConfigResponse,
 } from './types.ts';
 
-export type TabId = 'console' | 'graph' | 'audit' | 'certificate' | 'sanity' | 'architecture';
+export type TabId = 'landing' | 'console' | 'graph' | 'audit' | 'certificate' | 'sanity' | 'architecture';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabId>('console');
+  const [activeTab, setActiveTab] = useState<TabId>('landing');
+  const [stagedQuery, setStagedQuery] = useState<string>('');
+  const [isAddTopicOpen, setIsAddTopicOpen] = useState<boolean>(false);
   const [systemStatus, setSystemStatus] = useState<SystemStatusResponse | null>(null);
   const [sanityConfig, setSanityConfig] = useState<SanityConfigResponse | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -87,12 +91,16 @@ export default function App() {
     }
   }, []);
 
-  // Track selectedId separately so we can force a refresh on the same ID
   const [refreshTick, setRefreshTick] = useState(0);
 
   const handleSelectInvestigation = useCallback((id: string) => {
     setSelectedId(id);
     setRefreshTick(t => t + 1);
+  }, []);
+
+  const handleStagedQuery = useCallback((query: string) => {
+    setStagedQuery(query);
+    setActiveTab('console');
   }, []);
 
   useEffect(() => { loadInitialData(); }, [loadInitialData]);
@@ -102,22 +110,30 @@ export default function App() {
   }, [selectedId, refreshTick, loadInvestigationDetails]);
 
   return (
-    <div className="min-h-screen bg-[#FF5A1F] text-black flex flex-col font-serif selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-[#1A3831] text-[#0E241E] flex flex-col font-sans selection:bg-[#DE4B39] selection:text-white">
       <Header
         systemStatus={systemStatus}
         sanityConfig={sanityConfig}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         investigationCount={investigationsList.length}
+        onOpenAddTopic={() => setIsAddTopicOpen(true)}
       />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
+      <main className={`flex-1 w-full ${activeTab === 'landing' ? 'max-w-none px-0 py-0' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
         {loadError && (
-          <div className="mb-6 p-4 rounded-2xl border-2 border-black bg-black text-white font-mono text-sm">
+          <div className="max-w-7xl mx-auto mb-6 p-4 rounded-2xl border-2 border-[#0E241E] bg-[#DE4B39] text-white font-mono text-sm shadow-[4px_4px_0_#0E241E]">
             <strong>Backend connection error:</strong> {loadError}
           </div>
         )}
 
+        {activeTab === 'landing' && (
+          <LandingPage
+            onNavigateTab={setActiveTab}
+            onSelectQuery={handleStagedQuery}
+            onOpenAddTopic={() => setIsAddTopicOpen(true)}
+          />
+        )}
         {activeTab === 'console' && (
           <InvestigationConsole
             currentInvestigation={currentInvestigation}
@@ -125,6 +141,7 @@ export default function App() {
             onSelectInvestigation={handleSelectInvestigation}
             onRefreshInvestigations={refreshInvestigations}
             onNavigateTab={(tab) => setActiveTab(tab as TabId)}
+            initialQuestion={stagedQuery}
           />
         )}
         {activeTab === 'graph' && (
@@ -137,29 +154,40 @@ export default function App() {
           <CertificateVerifier certificate={certificate} investigationId={selectedId} />
         )}
         {activeTab === 'sanity' && (
-          <SanityExplorer sanityConfig={sanityConfig} />
+          <SanityExplorer
+            sanityConfig={sanityConfig}
+            onOpenAddTopic={() => setIsAddTopicOpen(true)}
+          />
         )}
         {activeTab === 'architecture' && (
           <ArchitectureView />
         )}
       </main>
 
-      <footer className="border-t-2 border-black bg-white py-4">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#FF5A1F] border border-black" />
-            <span className="font-black uppercase tracking-wider">ATLAS Knowledge Integrity Auditor</span>
-            <span className="text-[#888888]">·</span>
-            <span className="italic text-[#555555]">Sanity Context MCP · LangGraph · HMAC-SHA256 Merkle</span>
+      <AddTopicModal
+        isOpen={isAddTopicOpen}
+        onClose={() => setIsAddTopicOpen(false)}
+        onStartAudit={handleStagedQuery}
+      />
+
+      {activeTab !== 'landing' && (
+        <footer className="border-t-2 border-[#0E241E] bg-[#FAF7F2] py-4 mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#0E241E]">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#DE4B39] border border-[#0E241E]" />
+              <span className="font-black uppercase tracking-wider">ATLAS Knowledge Integrity Auditor</span>
+              <span className="text-[#888888]">·</span>
+              <span className="text-[#5B756E]">Sanity Context MCP · LangGraph · HMAC-SHA256 Merkle</span>
+            </div>
+            {sanityConfig?.projectId && sanityConfig.projectId !== '(not configured)' && (
+              <span className="text-[#5B756E]">
+                Sanity: <strong className="text-[#0E241E]">{sanityConfig.projectId}</strong>
+                <span className="ml-1 text-[#888888]">/ {sanityConfig.dataset}</span>
+              </span>
+            )}
           </div>
-          {sanityConfig?.projectId && sanityConfig.projectId !== '(not configured)' && (
-            <span className="text-[#555555]">
-              Sanity: <strong className="text-black">{sanityConfig.projectId}</strong>
-              <span className="ml-1 text-[#888888]">/ {sanityConfig.dataset}</span>
-            </span>
-          )}
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }
