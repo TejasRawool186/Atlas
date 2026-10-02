@@ -229,12 +229,14 @@ export class SanityClient {
     entity: SanityEntity;
     claims: SanityClaim[];
     liveSanityCreated: boolean;
+    liveSanityError?: string | null;
   }> {
     // 1. Add to local corpus engine
     const localResult = corpusEngine.addKnowledgeDoc(data);
 
     // 2. If configured with live Sanity API Token, send mutations to live Content Lake
     let liveSanityCreated = false;
+    let liveSanityError: string | null = null;
     if (this.cfg.isConfigured && this.cfg.projectId && this.cfg.apiToken) {
       try {
         const mutateUrl = `https://${this.cfg.projectId}.api.sanity.io/v${this.cfg.apiVersion}/data/mutate/${this.cfg.dataset}`;
@@ -324,6 +326,7 @@ export class SanityClient {
       entity: localResult.entity,
       claims: localResult.claims,
       liveSanityCreated,
+      liveSanityError,
     };
   }
 }
