@@ -1,8 +1,5 @@
-/**
- * ATLAS — Environment Configuration
- * Centralizes all environment variable access with validation.
- * Fails fast with clear messages when required config is missing.
- */
+import dotenv from 'dotenv';
+dotenv.config();
 
 export interface AtlasConfig {
   port: number;
