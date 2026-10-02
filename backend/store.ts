@@ -47,7 +47,15 @@ export class AtlasDataStore {
   public getInvestigationCount(): number { return this.investigations.size; }
   public getCertificateCount(): number { return this.certificates.size; }
 
-  public subscribeToEvents(invId: string, listener: (event: InvestigationEvent) => void): () => void {
+  /**
+   * Returns investigations created within the last N hours.
+   */
+  public getRecentInvestigations(hours = 24): InvestigationState[] {
+    const cutoff = Date.now() - hours * 60 * 60 * 1000;
+    return this.getAllInvestigations().filter(
+      inv => new Date(inv.createdAt).getTime() > cutoff
+    );
+  }, listener: (event: InvestigationEvent) => void): () => void {
     if (!this.sseSubscribers.has(invId)) {
       this.sseSubscribers.set(invId, new Set());
     }
