@@ -21,6 +21,13 @@ export class KnowledgeBaseService {
   public getAll(): SanityKnowledgeDoc[] {
     return sanityClient.getAllKnowledgeDocs();
   }
+
+  /**
+   * Returns the count of knowledge documents in the current corpus.
+   */
+  public count(): number {
+    return this.getAll().length;
+  }
 }
 
 export const knowledgeBase = new KnowledgeBaseService();
