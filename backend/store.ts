@@ -43,7 +43,9 @@ export class AtlasDataStore {
     return undefined;
   }
 
-  public subscribeToEvents(invId: string, listener: (event: InvestigationEvent) => void): () => void {
+  public getUptime(): number { return process.uptime(); }
+  public getInvestigationCount(): number { return this.investigations.size; }
+  public getCertificateCount(): number { return this.certificates.size; }(invId: string, listener: (event: InvestigationEvent) => void): () => void {
     if (!this.sseSubscribers.has(invId)) {
       this.sseSubscribers.set(invId, new Set());
     }
