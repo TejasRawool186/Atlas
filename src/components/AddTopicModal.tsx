@@ -306,10 +306,25 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, o
                   <p>Document ID: <strong className="bg-white px-1.5 py-0.5 rounded border border-[#0E241E]">{publishedResult.docId}</strong></p>
                   <p>Title: <strong>{publishedResult.title}</strong></p>
                   <p>Active Verified Claims: <strong>{publishedResult.claimsCount}</strong></p>
-                  <p className="text-[11px] text-[#5B756E]">
-                    Mode: {publishedResult.liveSanityCreated ? 'Live Sanity Lake API (Committed)' : 'Local Corpus Engine (Indexed & Queryable)'}
-                  </p>
                 </div>
+
+                {!publishedResult.liveSanityCreated && (
+                  <div className="mt-3 p-3 rounded-xl bg-[#FAF0CA]/90 border border-[#DE4B39]/40 text-[11px] font-sans text-[#5C3408] space-y-1.5 shadow-xs">
+                    <div className="flex items-center gap-1.5 font-black font-display text-[#DE4B39]">
+                      <AlertTriangle className="w-3.5 h-3.5 text-[#DE4B39] shrink-0" />
+                      <span>Sanity Cloud Storage Status: Permission Notice</span>
+                    </div>
+                    <p className="leading-relaxed">
+                      Your topic is <strong>fully indexed and ready to audit</strong> in ATLAS. However, the document could not be written to remote Sanity cloud DB because your API token is read-only (Viewer role):
+                    </p>
+                    <code className="block bg-white/90 p-1.5 rounded border border-[#DE4B39]/30 font-mono text-[10px] text-[#DE4B39] break-all">
+                      {publishedResult.liveSanityError || "403 Forbidden: Insufficient permissions; permission 'create' required"}
+                    </code>
+                    <p className="text-[10.5px] leading-relaxed text-[#0E241E]/80">
+                      💡 To enable remote Sanity cloud mutations: open <strong className="font-mono">sanity.io/manage</strong> &rarr; Project <strong className="font-mono">hrexnsmi</strong> &rarr; <strong>API &rarr; Tokens</strong>, create an <strong>Editor</strong> token, and paste it into <strong className="font-mono">.env</strong> as <strong className="font-mono">SANITY_API_TOKEN</strong>.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Suggested Questions */}
