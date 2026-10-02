@@ -2,96 +2,124 @@
 
 @layer base {
   :root {
-    --bg-orange: #FF5A1F;
-    --text-black: #000000;
+    --bg-pine: #1A3831;
+    --bg-pine-dark: #132B25;
+    --bg-pine-surface: #22443C;
+    --bg-oat: #F5EFE6;
     --surface-white: #FFFFFF;
-    --surface-light: #F4F4F4;
-    --text-secondary: #555555;
-    --text-muted: #888888;
+    --surface-card: #FAF7F2;
+    --accent-coral: #DE4B39;
+    --accent-coral-hover: #C63A29;
+    --accent-amber: #F5A623;
+    --accent-mint: #2EC4B6;
+    --border-pine: #0E241E;
+    --text-dark: #0E241E;
+    --text-light: #F7F4EE;
+    --text-muted: #5B756E;
   }
 
   body {
-    background-color: #FF5A1F;
-    color: #000000;
-    font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif;
+    background-color: #1A3831;
+    color: #0E241E;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Monospaced typewriter and passport serial text */
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* Monospaced typewriter & code */
   code, pre, .font-mono {
     font-family: 'Space Mono', 'Courier Prime', monospace !important;
   }
 }
 
-/* Custom Neo-Brutalist Passport & Travel Journal Classes */
+/* ─── Hacktoberfest / Neo-Brutalist Pine & Coral Design System ────────────── */
+
 .passport-card {
-  background-color: #FFFFFF;
-  color: #000000;
-  border: 2px solid #000000;
-  border-radius: 22px;
-  box-shadow: 8px 10px 0px #000000;
+  background-color: #FAF7F2;
+  color: #0E241E;
+  border: 2px solid #0E241E;
+  border-radius: 16px;
+  box-shadow: 5px 6px 0px #0E241E;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .passport-card-sm {
-  background-color: #FFFFFF;
-  color: #000000;
-  border: 2px solid #000000;
-  border-radius: 16px;
-  box-shadow: 5px 6px 0px #000000;
+  background-color: #FAF7F2;
+  color: #0E241E;
+  border: 2px solid #0E241E;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0px #0E241E;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.stamp-btn {
-  background-color: #000000;
-  color: #FFFFFF;
-  border: 2px solid #000000;
+.passport-card-dark {
+  background-color: #132B25;
+  color: #F7F4EE;
+  border: 2px solid #0E241E;
   border-radius: 16px;
-  box-shadow: 4px 5px 0px #000000;
-  font-family: 'Playfair Display', serif;
+  box-shadow: 5px 6px 0px #0E241E;
+}
+
+/* Primary Action Button (Hacktoberfest Coral) */
+.stamp-btn {
+  background-color: #DE4B39;
+  color: #FFFFFF;
+  border: 2px solid #0E241E;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0px #0E241E;
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  letter-spacing: 0.02em;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
 }
 
 .stamp-btn:hover {
-  background-color: #1a1a1a;
+  background-color: #C63A29;
   transform: translate(2px, 2px);
-  box-shadow: 2px 3px 0px #000000;
+  box-shadow: 2px 2px 0px #0E241E;
 }
 
 .stamp-btn:active {
-  transform: translate(4px, 5px);
-  box-shadow: 0px 0px 0px #000000;
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #0E241E;
 }
 
+/* Secondary Button (Warm Cream / White) */
 .stamp-btn-secondary {
   background-color: #FFFFFF;
-  color: #000000;
-  border: 2px solid #000000;
-  border-radius: 16px;
-  box-shadow: 4px 5px 0px #000000;
-  font-family: 'Playfair Display', serif;
+  color: #0E241E;
+  border: 2px solid #0E241E;
+  border-radius: 14px;
+  box-shadow: 3px 4px 0px #0E241E;
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  letter-spacing: 0.02em;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
 }
 
 .stamp-btn-secondary:hover {
-  background-color: #F4F4F4;
-  transform: translate(2px, 2px);
-  box-shadow: 2px 3px 0px #000000;
+  background-color: #F5EFE6;
+  transform: translate(1px, 2px);
+  box-shadow: 2px 2px 0px #0E241E;
 }
 
+.stamp-btn-secondary:active {
+  transform: translate(3px, 4px);
+  box-shadow: 0px 0px 0px #0E241E;
+}
+
+/* Badges */
 .passport-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  border: 2px solid #000000;
+  border: 2px solid #0E241E;
   border-radius: 9999px;
   padding: 0.25rem 0.75rem;
   font-family: 'Space Mono', monospace;
@@ -99,32 +127,42 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background-color: #FFFFFF;
-  color: #000000;
-  box-shadow: 3px 3px 0px #000000;
+  background-color: #FAF7F2;
+  color: #0E241E;
+  box-shadow: 2px 2px 0px #0E241E;
 }
 
+/* Paper Input */
 .paper-input {
   background-color: #FFFFFF;
-  color: #000000;
-  border: 2px solid #000000;
-  border-radius: 16px;
-  box-shadow: 4px 5px 0px #000000;
-  font-family: 'Space Mono', monospace;
+  color: #0E241E;
+  border: 2px solid #0E241E;
+  border-radius: 14px;
+  box-shadow: 3px 4px 0px #0E241E;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .paper-input:focus {
   outline: none;
-  border-color: #000000;
-  box-shadow: 6px 7px 0px #000000;
+  border-color: #DE4B39;
+  box-shadow: 4px 5px 0px #0E241E;
 }
 
-/* Subtle vintage travel stamp rotation */
-.rotate-journal-subtle {
-  transform: rotate(-0.5deg);
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
-
-.rotate-journal-alt {
-  transform: rotate(0.75deg);
+::-webkit-scrollbar-track {
+  background: #EFE8DC;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #1A3831;
+  border: 1px solid #0E241E;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #DE4B39;
 }
