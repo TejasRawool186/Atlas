@@ -53,9 +53,17 @@ export const Header: React.FC<HeaderProps> = ({
                 2026
               </span>
             </div>
-            <p className="text-[11px] text-[#5B756E] font-sans mt-0.5 font-semibold">
-              AI Knowledge Integrity Auditor
-            </p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <p className="text-[10.5px] text-[#5B756E] font-sans font-semibold tracking-tight">
+                AI Knowledge Integrity Auditor
+              </p>
+              {sanityConnected && (
+                <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-[#144A3E] bg-[#2EC4B6]/25 border border-[#144A3E]/30 px-1.5 py-0.2 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2EC4B6] animate-pulse" />
+                  Live
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
