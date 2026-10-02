@@ -207,6 +207,7 @@ sanityRouter.post('/topic', async (req: Request, res: Response) => {
       entity: saved.entity,
       claims: saved.claims,
       liveSanityCreated: saved.liveSanityCreated,
+      liveSanityError: saved.liveSanityError,
       suggestedQuestions,
     });
   } catch (err: unknown) {
