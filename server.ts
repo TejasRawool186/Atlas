@@ -1,14 +1,7 @@
-/**
- * ATLAS — Server Entry Point
- * Express server with Vite middleware (development) or static file serving (production).
- */
-
+import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
-import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-dotenv.config();
 
 import { investigationsRouter } from './backend/routes/investigations.ts';
 import { certificatesRouter } from './backend/routes/certificates.ts';
