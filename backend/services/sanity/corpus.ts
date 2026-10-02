@@ -728,6 +728,21 @@ export class SanityCorpusEngine {
     });
   }
 
+  /**
+   * Returns a summary of corpus statistics for debugging and system status.
+   */
+  public getStats(): Record<string, number> {
+    return {
+      entities: this.entities.size,
+      claims: this.claims.size,
+      sources: this.sources.size,
+      relationships: this.relationships.size,
+      conflicts: this.conflicts.size,
+      events: this.events.size,
+      knowledgeDocs: this.knowledgeDocs.size,
+    };
+  }
+
   executeGroq(groq: string, params: Record<string, any> = {}): any {
     const q = groq.trim();
     if (q.includes('"entity"')) {
