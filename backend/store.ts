@@ -55,7 +55,12 @@ export class AtlasDataStore {
     return this.getAllInvestigations().filter(
       inv => new Date(inv.createdAt).getTime() > cutoff
     );
-  }, listener: (event: InvestigationEvent) => void): () => void {
+  }
+
+  public subscribeToEvents(
+    invId: string,
+    listener: (event: InvestigationEvent) => void
+  ): () => void {
     if (!this.sseSubscribers.has(invId)) {
       this.sseSubscribers.set(invId, new Set());
     }
