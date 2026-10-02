@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
   const sanityConnected = sanityMode === 'live';
 
   return (
-    <header className="border-b-2 border-[#0E241E] bg-[#142C26] sticky top-0 z-40 shadow-[0_4px_0_#0E241E]">
+    <header className="border-b-2 border-[#0E241E] bg-[#FAF7F2] sticky top-0 z-40 shadow-[0_4px_0_#0E241E] transition-colors">
       {/* Main header row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
         {/* Brand */}
@@ -48,12 +48,12 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-white leading-none font-display">ATLAS</h1>
+              <h1 className="text-2xl font-black tracking-tight text-[#0E241E] leading-none font-display">ATLAS</h1>
               <span className="text-[10px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-md border-2 border-[#0E241E] bg-[#DE4B39] text-white shadow-[2px_2px_0_#0E241E]">
                 2026
               </span>
             </div>
-            <p className="text-[11px] text-[#A3C2B8] font-sans mt-0.5 font-medium">
+            <p className="text-[11px] text-[#5B756E] font-sans mt-0.5 font-semibold">
               AI Knowledge Integrity Auditor
             </p>
           </div>
