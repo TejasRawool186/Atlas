@@ -78,6 +78,7 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, o
     title: string;
     claimsCount: number;
     liveSanityCreated: boolean;
+    liveSanityError?: string | null;
     suggestedQuestions: string[];
   } | null>(null);
 
@@ -142,6 +143,7 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, o
           title: res.document.title,
           claimsCount: res.claims.length,
           liveSanityCreated: res.liveSanityCreated,
+          liveSanityError: res.liveSanityError,
           suggestedQuestions: res.suggestedQuestions,
         });
       }
@@ -179,6 +181,7 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, o
           title: res.document.title,
           claimsCount: res.claims.length,
           liveSanityCreated: res.liveSanityCreated,
+          liveSanityError: res.liveSanityError,
           suggestedQuestions: res.suggestedQuestions,
         });
       }
@@ -216,6 +219,7 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, o
           title: res.document.title,
           claimsCount: res.claims.length,
           liveSanityCreated: res.liveSanityCreated,
+          liveSanityError: res.liveSanityError,
           suggestedQuestions: res.suggestedQuestions,
         });
       }
