@@ -288,10 +288,19 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, o
           {/* SUCCESS SCREEN */}
           {publishedResult ? (
             <div className="space-y-6 animate-fadeIn">
-              <div className="p-5 rounded-2xl bg-[#2EC4B6]/25 border-2 border-[#0E241E] shadow-[4px_4px_0_#0E241E] space-y-2">
-                <div className="flex items-center gap-2 text-sm font-black font-display text-[#0E241E]">
-                  <CheckCircle2 className="w-5 h-5 text-[#0E241E] stroke-[3]" />
-                  <span>Successfully Published to Sanity Content Lake!</span>
+              <div className={`p-5 rounded-2xl border-2 border-[#0E241E] shadow-[4px_4px_0_#0E241E] space-y-2.5 ${publishedResult.liveSanityCreated ? 'bg-[#2EC4B6]/25' : 'bg-[#FAF7F2]'}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-sm font-black font-display text-[#0E241E]">
+                    <CheckCircle2 className={`w-5 h-5 stroke-[3] ${publishedResult.liveSanityCreated ? 'text-[#0E241E]' : 'text-[#DE4B39]'}`} />
+                    <span>
+                      {publishedResult.liveSanityCreated
+                        ? 'Successfully Published to Sanity Content Lake!'
+                        : 'Topic Ingested into Knowledge Engine'}
+                    </span>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border border-[#0E241E] ${publishedResult.liveSanityCreated ? 'bg-[#2EC4B6] text-[#0E241E]' : 'bg-[#FAF0CA] text-[#7A4B17]'}`}>
+                    {publishedResult.liveSanityCreated ? 'Live Sanity Cloud' : 'Local Engine'}
+                  </span>
                 </div>
                 <div className="text-xs font-mono space-y-1 text-[#0E241E]/90 pt-1">
                   <p>Document ID: <strong className="bg-white px-1.5 py-0.5 rounded border border-[#0E241E]">{publishedResult.docId}</strong></p>
