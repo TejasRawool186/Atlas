@@ -35,34 +35,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="border-b-2 border-[#0E241E] bg-[#142C26] sticky top-0 z-40 shadow-[0_4px_0_#0E241E]">
-      {/* Status bar */}
-      <div className="border-b-2 border-[#0E241E] bg-[#0E201B] px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-[#E4EFEA]">
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* Sanity status pill */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border-2 border-[#0E241E] bg-[#1D3B33] font-bold tracking-wider shadow-[2px_2px_0_#0E241E] text-white">
-            <span className={`w-2 h-2 rounded-full border border-[#0E241E] ${sanityConnected ? 'bg-[#2EC4B6] animate-pulse' : 'bg-[#888]'}`} />
-            <span>SANITY CONTEXT MCP · {sanityConnected ? 'LIVE' : sanityMode === 'local-corpus' ? 'LOCAL CORPUS' : 'CONNECTING'}</span>
-          </div>
-
-          {sanityConfig?.projectId && sanityConfig.projectId !== '(not configured)' && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[#A3C2B8]">Project:</span>
-              <span className="font-bold bg-[#FAF7F2] text-[#0E241E] border border-[#0E241E] px-2 py-0.5 rounded shadow-[2px_2px_0_#0E241E]">
-                {sanityConfig.projectId}
-              </span>
-              <span className="text-[#A3C2B8]">/ {sanityConfig.dataset}</span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3 text-[11px]">
-          {systemStatus?.llm && (
-            <span className="text-[#A3C2B8]">LLM: <strong className="text-white font-bold">{systemStatus.llm}</strong></span>
-          )}
-          <span className="text-[#DE4B39] font-bold tracking-wider">HMAC-SHA256 · MERKLE</span>
-        </div>
-      </div>
-
       {/* Main header row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
         {/* Brand */}
