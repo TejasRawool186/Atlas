@@ -209,6 +209,123 @@ export class SanityClient {
     }
     return corpusEngine.getAllKnowledgeDocs();
   }
+
+  /**
+   * Creates and stores a new knowledge document into Sanity Content Lake.
+   * If live credentials are set, pushes mutations via HTTP API.
+   * Also always registers in corpusEngine for instant local query availability.
+   */
+  public async createKnowledgeDoc(data: {
+    title: string;
+    docType: string;
+    sourceUrl: string;
+    publishedAt?: string;
+    author: string;
+    summary: string;
+    content?: string;
+    extractedClaims?: string[];
+  }): Promise<{
+    doc: SanityKnowledgeDoc;
+    entity: SanityEntity;
+    claims: SanityClaim[];
+    liveSanityCreated: boolean;
+  }> {
+    // 1. Add to local corpus engine
+    const localResult = corpusEngine.addKnowledgeDoc(data);
+
+    // 2. If configured with live Sanity API Token, send mutations to live Content Lake
+    let liveSanityCreated = false;
+    if (this.cfg.isConfigured && this.cfg.projectId && this.cfg.apiToken) {
+      try {
+        const mutateUrl = `https://${this.cfg.projectId}.api.sanity.io/v${this.cfg.apiVersion}/data/mutate/${this.cfg.dataset}`;
+        
+        const mutations: any[] = [
+          {
+            createOrReplace: {
+              _id: localResult.source._id,
+              _type: 'source',
+              title: localResult.source.title,
+              url: localResult.source.url,
+              publisher: localResult.source.publisher,
+              publishedAt: localResult.source.publishedAt,
+              sourceType: localResult.source.sourceType,
+              author: localResult.source.author,
+              excerpt: localResult.source.excerpt,
+            },
+          },
+          {
+            createOrReplace: {
+              _id: localResult.entity._id,
+              _type: 'entity',
+              name: localResult.entity.name,
+              entityType: localResult.entity.entityType,
+              description: localResult.entity.description,
+              aliases: localResult.entity.aliases,
+            },
+          },
+          {
+            createOrReplace: {
+              _id: localResult.doc._id,
+              _type: 'knowledge_doc',
+              title: localResult.doc.title,
+              docType: localResult.doc.docType,
+              sourceUrl: localResult.doc.sourceUrl,
+              publishedAt: localResult.doc.publishedAt,
+              author: localResult.doc.author,
+              summary: localResult.doc.summary,
+              content: localResult.doc.content,
+              extractedClaims: localResult.doc.extractedClaims,
+              referencedEntities: localResult.doc.referencedEntities,
+            },
+          },
+        ];
+
+        // Add claim mutations
+        for (const cl of localResult.claims) {
+          mutations.push({
+            createOrReplace: {
+              _id: cl._id,
+              _type: 'claim',
+              statement: cl.statement,
+              subject: { _type: 'reference', _ref: localResult.entity._id },
+              predicate: cl.predicate,
+              object: cl.object || cl.statement,
+              sources: [{ _type: 'reference', _ref: localResult.source._id }],
+              validFrom: cl.validFrom,
+              status: cl.status,
+              confidence: cl.confidence,
+            },
+          });
+        }
+
+        const res = await fetch(mutateUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${this.cfg.apiToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ mutations }),
+        });
+
+        if (res.ok) {
+          liveSanityCreated = true;
+          console.log(`[SanityClient] Successfully created documents in live Sanity Lake (Doc: ${localResult.doc._id})`);
+        } else {
+          const errText = await res.text();
+          console.warn(`[SanityClient] Live Sanity mutation returned ${res.status}: ${errText}`);
+        }
+      } catch (err) {
+        console.warn('[SanityClient] Live Sanity mutation failed, preserved in local corpus:', err);
+      }
+    }
+
+    return {
+      doc: localResult.doc,
+      entity: localResult.entity,
+      claims: localResult.claims,
+      liveSanityCreated,
+    };
+  }
 }
 
 export const sanityClient = new SanityClient();
