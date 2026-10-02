@@ -58,6 +58,9 @@ export interface InvestigationState {
   completedAt?: string;
 }
 
+/** Maximum time in ms to wait for a single LLM call before giving up */
+const LLM_TIMEOUT_MS = 30_000;
+
 export class AtlasInvestigationAgent {
   public async runWorkflow(
     investigationId: string,
