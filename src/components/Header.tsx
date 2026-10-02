@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Compass, BookOpen, Award, Globe, Radio } from 'lucide-react';
+import { Shield, Compass, BookOpen, Award, Globe, Radio, Flame, ArrowRight, Plus } from 'lucide-react';
 import type { SystemStatusResponse, SanityConfigResponse } from '../types.ts';
 import type { TabId } from '../App.tsx';
 
@@ -9,9 +9,11 @@ interface HeaderProps {
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
   investigationCount: number;
+  onOpenAddTopic?: () => void;
 }
 
 const tabs: { id: TabId; label: string; Icon: React.FC<{ className?: string }> }[] = [
+  { id: 'landing',      label: 'Overview',       Icon: Flame },
   { id: 'console',      label: 'Investigation',  Icon: Radio },
   { id: 'graph',        label: 'Evidence Graph', Icon: Compass },
   { id: 'audit',        label: 'Audit Probes',   Icon: Shield },
@@ -26,85 +28,114 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   investigationCount,
+  onOpenAddTopic,
 }) => {
   const sanityMode = sanityConfig?.mode ?? null;
   const sanityConnected = sanityMode === 'live';
 
   return (
-    <header className="border-b-2 border-black bg-white sticky top-0 z-40 shadow-[0_4px_0_#000]">
+    <header className="border-b-2 border-[#0E241E] bg-[#142C26] sticky top-0 z-40 shadow-[0_4px_0_#0E241E]">
       {/* Status bar */}
-      <div className="border-b-2 border-black bg-[#F4F4F4] px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono">
+      <div className="border-b-2 border-[#0E241E] bg-[#0E201B] px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-[#E4EFEA]">
         <div className="flex items-center gap-3 flex-wrap">
           {/* Sanity status pill */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border-2 border-black bg-white font-bold tracking-wider shadow-[2px_2px_0_#000]">
-            <span className={`w-2 h-2 rounded-full border border-black ${sanityConnected ? 'bg-[#FF5A1F] animate-pulse' : 'bg-[#888]'}`} />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border-2 border-[#0E241E] bg-[#1D3B33] font-bold tracking-wider shadow-[2px_2px_0_#0E241E] text-white">
+            <span className={`w-2 h-2 rounded-full border border-[#0E241E] ${sanityConnected ? 'bg-[#2EC4B6] animate-pulse' : 'bg-[#888]'}`} />
             <span>SANITY CONTEXT MCP · {sanityConnected ? 'LIVE' : sanityMode === 'local-corpus' ? 'LOCAL CORPUS' : 'CONNECTING'}</span>
           </div>
 
           {sanityConfig?.projectId && sanityConfig.projectId !== '(not configured)' && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[#555]">Project:</span>
-              <span className="font-bold bg-white border border-black px-2 py-0.5 rounded shadow-[2px_2px_0_#000]">
+              <span className="text-[#A3C2B8]">Project:</span>
+              <span className="font-bold bg-[#FAF7F2] text-[#0E241E] border border-[#0E241E] px-2 py-0.5 rounded shadow-[2px_2px_0_#0E241E]">
                 {sanityConfig.projectId}
               </span>
-              <span className="text-[#555]">/ {sanityConfig.dataset}</span>
+              <span className="text-[#A3C2B8]">/ {sanityConfig.dataset}</span>
             </div>
           )}
         </div>
 
         <div className="flex items-center gap-3 text-[11px]">
           {systemStatus?.llm && (
-            <span className="text-[#555]">LLM: <strong className="text-black">{systemStatus.llm}</strong></span>
+            <span className="text-[#A3C2B8]">LLM: <strong className="text-white font-bold">{systemStatus.llm}</strong></span>
           )}
-          <span className="text-[#888] italic">HMAC-SHA256 · Merkle</span>
+          <span className="text-[#DE4B39] font-bold tracking-wider">HMAC-SHA256 · MERKLE</span>
         </div>
       </div>
 
       {/* Main header row */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
         {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#FF5A1F] border-2 border-black flex items-center justify-center shadow-[3px_3px_0_#000] shrink-0">
-            <Shield className="w-5 h-5 text-black stroke-[2.5]" />
+        <div
+          onClick={() => setActiveTab('landing')}
+          className="flex items-center gap-3 cursor-pointer group"
+          title="Go to Overview Landing Page"
+        >
+          <div className="w-10 h-10 rounded-xl bg-[#DE4B39] border-2 border-[#0E241E] flex items-center justify-center shadow-[3px_3px_0_#0E241E] shrink-0 group-hover:-translate-y-0.5 transition-transform">
+            <Shield className="w-5 h-5 text-white stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-black leading-none">ATLAS</h1>
-              <span className="text-[10px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-md border-2 border-black bg-[#FF5A1F] text-black shadow-[2px_2px_0_#000]">
-                v1.0
+              <h1 className="text-2xl font-black tracking-tight text-white leading-none font-display">ATLAS</h1>
+              <span className="text-[10px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-md border-2 border-[#0E241E] bg-[#DE4B39] text-white shadow-[2px_2px_0_#0E241E]">
+                2026
               </span>
             </div>
-            <p className="text-[11px] text-[#555] font-serif italic mt-0.5">
+            <p className="text-[11px] text-[#A3C2B8] font-sans mt-0.5 font-medium">
               AI Knowledge Integrity Auditor
             </p>
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex items-center gap-1.5 flex-wrap">
-          {tabs.map(({ id, label, Icon }) => {
-            const active = activeTab === id;
-            return (
-              <button
-                key={id}
-                onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all cursor-pointer border-2 border-black ${
-                  active
-                    ? 'bg-black text-white shadow-[3px_3px_0_#000] -translate-y-px'
-                    : 'bg-white text-black shadow-[2px_2px_0_#000] hover:bg-[#F4F4F4] hover:-translate-y-px hover:shadow-[3px_3px_0_#000]'
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 stroke-[2.2] ${active ? 'text-[#FF5A1F]' : 'text-black'}`} />
-                <span>{label}</span>
-                {id === 'console' && (
-                  <span className={`text-[10px] font-mono px-1.5 rounded-full border border-black ${active ? 'bg-[#FF5A1F] text-black' : 'bg-black text-white'}`}>
-                    {investigationCount}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+        {/* Navigation & Action */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <nav className="flex items-center gap-1.5 flex-wrap">
+            {tabs.map(({ id, label, Icon }) => {
+              const active = activeTab === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all cursor-pointer border-2 border-[#0E241E] font-display ${
+                    active
+                      ? 'bg-[#DE4B39] text-white shadow-[3px_3px_0_#0E241E] -translate-y-px'
+                      : 'bg-[#FAF7F2] text-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:bg-white hover:-translate-y-px hover:shadow-[3px_3px_0_#0E241E]'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 stroke-[2.2] ${active ? 'text-white' : 'text-[#0E241E]'}`} />
+                  <span>{label}</span>
+                  {id === 'console' && (
+                    <span className={`text-[10px] font-mono px-1.5 rounded-full border border-[#0E241E] ${active ? 'bg-[#0E241E] text-white' : 'bg-[#DE4B39] text-white'}`}>
+                      {investigationCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          {onOpenAddTopic && (
+            <button
+              onClick={onOpenAddTopic}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-[#F5A623] text-[#0E241E] border-2 border-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:-translate-y-px hover:shadow-[3px_3px_0_#0E241E] cursor-pointer font-display ml-1"
+              title="Ingest new article link or topic into Sanity"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+              <span className="hidden sm:inline">Add Topic / URL</span>
+              <span className="sm:hidden">Add</span>
+            </button>
+          )}
+
+          {activeTab !== 'console' && (
+            <button
+              onClick={() => setActiveTab('console')}
+              className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-[#2EC4B6] text-[#0E241E] border-2 border-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:-translate-y-px hover:shadow-[3px_3px_0_#0E241E] cursor-pointer font-display ml-1"
+            >
+              <span>Audit Console</span>
+              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );
