@@ -74,7 +74,8 @@ investigationsRouter.post('/:id/run', (req: Request, res: Response) => {
   // Run asynchronously — do not block the HTTP response
   setImmediate(async () => {
     try {
-      const finalState = await atlasAgent.runWorkflow(id, investigation.question, (ev: InvestigationEvent) => {
+      const finalState = await atlasAgent.runWorkflow(id, investigation.question, (ev: InvestigationEvent, state?: InvestigationState) => {
+        if (state) atlasStore.saveInvestigation({ ...state });
         atlasStore.broadcastEvent(id, ev);
       });
       atlasStore.saveInvestigation(finalState);
