@@ -314,6 +314,11 @@ export class SanityClient {
           console.log(`[SanityClient] Successfully created documents in live Sanity Lake (Doc: ${localResult.doc._id})`);
         } else {
           const errText = await res.text();
+          if (res.status === 403) {
+            liveSanityError = 'Your SANITY_API_TOKEN has Viewer (read-only) permissions. To write directly to live Sanity Content Lake, create an "Editor" token in sanity.io/manage.';
+          } else {
+            liveSanityError = `Sanity API HTTP ${res.status}: ${errText}`;
+          }
           console.warn(`[SanityClient] Live Sanity mutation returned ${res.status}: ${errText}`);
         }
       } catch (err) {
