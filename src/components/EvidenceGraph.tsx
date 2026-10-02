@@ -19,11 +19,11 @@ const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
 ];
 
 const NODE_STYLES: Record<string, { fill: string; stroke: string; textFill: string }> = {
-  entity:        { fill: '#000',    stroke: '#000', textFill: '#fff' },
-  claim:         { fill: '#fff',    stroke: '#000', textFill: '#000' },
-  source:        { fill: '#F4F4F4', stroke: '#000', textFill: '#000' },
-  conflict:      { fill: '#000',    stroke: '#000', textFill: '#fff' },
-  knowledge_doc: { fill: '#F4F4F4', stroke: '#000', textFill: '#000' },
+  entity:        { fill: '#1E3A34', stroke: '#0E241E', textFill: '#FFFFFF' },
+  claim:         { fill: '#FAF7F2', stroke: '#0E241E', textFill: '#0E241E' },
+  source:        { fill: '#FFFFFF', stroke: '#0E241E', textFill: '#0E241E' },
+  conflict:      { fill: '#DE4B39', stroke: '#0E241E', textFill: '#FFFFFF' },
+  knowledge_doc: { fill: '#F5A623', stroke: '#0E241E', textFill: '#0E241E' },
 };
 
 export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) => {
@@ -70,9 +70,9 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
   if (!evidence || evidence.nodes.length === 0) {
     return (
       <div className="passport-card p-16 text-center">
-        <Compass className="w-10 h-10 mx-auto text-black mb-3 stroke-[1.5]" />
-        <p className="text-base font-black text-black">No evidence graph available</p>
-        <p className="text-xs text-[#555] italic mt-1">
+        <Compass className="w-10 h-10 mx-auto text-[#DE4B39] mb-3 stroke-[1.5]" />
+        <p className="text-base font-black text-[#0E241E] font-display">No evidence graph available</p>
+        <p className="text-xs text-[#5B756E] mt-1">
           Complete an investigation to build the evidence topology.
         </p>
       </div>
@@ -84,27 +84,27 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
       {/* Header */}
       <div className="passport-card p-5 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center shadow-[3px_3px_0_#000]">
+          <div className="w-10 h-10 rounded-xl bg-[#DE4B39] text-white flex items-center justify-center shadow-[3px_3px_0_#0E241E] shrink-0">
             <Compass className="w-5 h-5 stroke-[2.2]" />
           </div>
           <div>
-            <h2 className="text-base font-black uppercase tracking-tight text-black">Evidence Graph</h2>
-            <p className="text-xs text-[#555] italic">
+            <h2 className="text-base font-black uppercase tracking-tight text-[#0E241E] font-display">Evidence Graph</h2>
+            <p className="text-xs text-[#5B756E]">
               {evidence.nodes.length} nodes · {evidence.edges.length} edges
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 flex-wrap">
-          <Filter className="w-3.5 h-3.5 text-[#555] mr-1" />
+          <Filter className="w-3.5 h-3.5 text-[#5B756E] mr-1" />
           {FILTER_OPTIONS.map(f => (
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer border-2 border-black ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer border-2 border-[#0E241E] font-display ${
                 filter === f.id
-                  ? 'bg-black text-white shadow-[3px_3px_0_#000]'
-                  : 'bg-white text-black shadow-[2px_2px_0_#000] hover:bg-[#F4F4F4]'
+                  ? 'bg-[#DE4B39] text-white shadow-[3px_3px_0_#0E241E]'
+                  : 'bg-white text-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:bg-[#FAF7F2]'
               }`}
             >
               {f.label}
@@ -117,27 +117,29 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
         {/* SVG canvas */}
         <div className="lg:col-span-8 passport-card p-5">
           {/* Legend */}
-          <div className="flex flex-wrap gap-4 text-[11px] font-bold uppercase pb-3 mb-3 border-b-2 border-black text-[#555]">
+          <div className="flex flex-wrap gap-4 text-[11px] font-bold uppercase pb-3 mb-3 border-b-2 border-[#0E241E] text-[#5B756E] font-display">
             {[
-              { color: '#000', label: 'Entity / Conflict' },
-              { color: '#fff', label: 'Active Claim', border: true },
-              { color: '#F4F4F4', label: 'Source / Doc', border: true },
+              { color: '#1E3A34', label: 'Entity', text: '#fff' },
+              { color: '#FAF7F2', label: 'Active Claim', border: true },
+              { color: '#FFFFFF', label: 'Source', border: true },
+              { color: '#DE4B39', label: 'Conflict', text: '#fff' },
+              { color: '#F5A623', label: 'Knowledge Doc' },
             ].map(l => (
               <div key={l.label} className="flex items-center gap-1.5">
                 <span
-                  className="w-3 h-3 rounded-full border-2 border-black"
+                  className="w-3 h-3 rounded-full border-2 border-[#0E241E]"
                   style={{ background: l.color }}
                 />
-                <span className="text-black">{l.label}</span>
+                <span className="text-[#0E241E]">{l.label}</span>
               </div>
             ))}
           </div>
 
-          <div className="relative w-full overflow-auto border-2 border-black rounded-2xl bg-white bg-[radial-gradient(#00000015_1px,transparent_1px)] [background-size:20px_20px]" style={{ height: 500 }}>
+          <div className="relative w-full overflow-auto border-2 border-[#0E241E] rounded-2xl bg-[#FAF7F2] bg-[radial-gradient(#0E241E15_1px,transparent_1px)] [background-size:20px_20px]" style={{ height: 500 }}>
             <svg width="860" height="480">
               <defs>
                 <marker id="arrowhead" viewBox="0 0 10 10" refX="20" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#000" />
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#0E241E" />
                 </marker>
               </defs>
 
@@ -185,7 +187,7 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
                     className="cursor-pointer"
                   >
                     {isSelected && (
-                      <circle r={22} fill="none" stroke="#FF5A1F" strokeWidth={3} strokeDasharray="4,2" />
+                      <circle r={22} fill="none" stroke="#DE4B39" strokeWidth={3} strokeDasharray="4,2" />
                     )}
                     <circle
                       r={16}
@@ -205,8 +207,8 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
                     </text>
                     <text
                       y={28} textAnchor="middle"
-                      fill="#000" fontSize={10}
-                      fontFamily="Playfair Display, serif"
+                      fill="#0E241E" fontSize={10}
+                      fontFamily="Plus Jakarta Sans, sans-serif"
                       fontWeight={isSelected ? 'bold' : '600'}
                       className="pointer-events-none select-none"
                     >
@@ -218,20 +220,20 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
             </svg>
           </div>
 
-          <p className="mt-2 text-[11px] text-[#555] italic font-serif">
+          <p className="mt-2 text-[11px] text-[#5B756E] italic">
             Click any node to inspect its evidence dossier. Case: {investigationId || '—'}
           </p>
         </div>
 
         {/* Detail panel */}
         <div className="lg:col-span-4 passport-card p-5 flex flex-col gap-4">
-          <div className="flex items-center justify-between pb-3 border-b-2 border-black">
+          <div className="flex items-center justify-between pb-3 border-b-2 border-[#0E241E]">
             <div className="flex items-center gap-2">
-              <Info className="w-4 h-4 stroke-[2.2]" />
-              <h3 className="text-sm font-black uppercase tracking-tight">Node Detail</h3>
+              <Info className="w-4 h-4 text-[#DE4B39] stroke-[2.2]" />
+              <h3 className="text-sm font-black uppercase tracking-tight text-[#0E241E] font-display">Node Detail</h3>
             </div>
             {selected && (
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black text-white">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-[#0E241E] bg-[#DE4B39] text-white">
                 {selected.type}
               </span>
             )}
@@ -240,18 +242,18 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
           {selected ? (
             <div className="space-y-4 text-xs">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-0.5">Label</p>
-                <p className="text-base font-black font-serif text-black">{selected.label}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#5B756E] mb-0.5 font-display">Label</p>
+                <p className="text-base font-black text-[#0E241E] font-display">{selected.label}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <div className="bg-[#F4F4F4] p-3 rounded-xl border-2 border-black shadow-[2px_2px_0_#000]">
-                  <p className="text-[10px] text-[#555] font-bold uppercase">ID</p>
-                  <p className="font-mono text-black font-bold text-[11px] truncate mt-0.5">{selected.id}</p>
+                <div className="bg-white p-3 rounded-xl border-2 border-[#0E241E] shadow-[2px_2px_0_#0E241E]">
+                  <p className="text-[10px] text-[#5B756E] font-bold uppercase font-display">ID</p>
+                  <p className="font-mono text-[#0E241E] font-bold text-[11px] truncate mt-0.5">{selected.id}</p>
                 </div>
-                <div className="bg-[#F4F4F4] p-3 rounded-xl border-2 border-black shadow-[2px_2px_0_#000]">
-                  <p className="text-[10px] text-[#555] font-bold uppercase">Status</p>
-                  <p className="font-bold text-black text-[11px] mt-0.5">{selected.status ?? selected.category ?? 'Active'}</p>
+                <div className="bg-white p-3 rounded-xl border-2 border-[#0E241E] shadow-[2px_2px_0_#0E241E]">
+                  <p className="text-[10px] text-[#5B756E] font-bold uppercase font-display">Status</p>
+                  <p className="font-bold text-[#0E241E] text-[11px] mt-0.5">{selected.status ?? selected.category ?? 'Active'}</p>
                 </div>
               </div>
 
@@ -262,38 +264,38 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
                 const excerpt = selected.metadata.excerpt as string | undefined;
                 const resolutionReason = selected.metadata.resolutionReason as string | undefined;
                 return (
-                  <div className="bg-[#F4F4F4] p-4 rounded-xl border-2 border-black space-y-3 shadow-[2px_2px_0_#000]">
+                  <div className="bg-white p-4 rounded-xl border-2 border-[#0E241E] space-y-3 shadow-[2px_2px_0_#0E241E]">
                     {url && (
                       <div>
-                        <p className="text-[10px] font-bold uppercase text-[#555] mb-1">Source URL</p>
-                        <a href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-mono text-[11px] text-black hover:underline truncate">
+                        <p className="text-[10px] font-bold uppercase text-[#5B756E] mb-1 font-display">Source URL</p>
+                        <a href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-mono text-[11px] text-[#DE4B39] hover:underline truncate">
                           <span className="truncate">{url}</span>
                           <ExternalLink className="w-3 h-3 shrink-0" />
                         </a>
                       </div>
                     )}
                     {publishedAt && (
-                      <div className="flex items-center gap-1.5 text-black">
-                        <Clock className="w-3.5 h-3.5 shrink-0" />
+                      <div className="flex items-center gap-1.5 text-[#0E241E]">
+                        <Clock className="w-3.5 h-3.5 text-[#5B756E] shrink-0" />
                         <span>Published: <strong>{new Date(publishedAt).toLocaleDateString()}</strong></span>
                       </div>
                     )}
                     {author && (
-                      <div className="flex items-center gap-1.5 text-black">
-                        <User className="w-3.5 h-3.5 shrink-0" />
+                      <div className="flex items-center gap-1.5 text-[#0E241E]">
+                        <User className="w-3.5 h-3.5 text-[#5B756E] shrink-0" />
                         <span>Author: <strong>{author}</strong></span>
                       </div>
                     )}
                     {excerpt && (
                       <div>
-                        <p className="text-[10px] font-bold uppercase text-[#555] mb-1">Excerpt</p>
-                        <p className="text-black italic bg-white p-2.5 rounded-lg border border-black text-[11px]">"{excerpt}"</p>
+                        <p className="text-[10px] font-bold uppercase text-[#5B756E] mb-1 font-display">Excerpt</p>
+                        <p className="text-[#0E241E] italic bg-[#FAF7F2] p-2.5 rounded-lg border border-[#0E241E] text-[11px]">"{excerpt}"</p>
                       </div>
                     )}
                     {resolutionReason && (
                       <div>
-                        <p className="text-[10px] font-bold uppercase text-black mb-1">Resolution</p>
-                        <p className="text-black bg-white p-2.5 rounded-lg border-2 border-black text-[11px]">{resolutionReason}</p>
+                        <p className="text-[10px] font-bold uppercase text-[#0E241E] mb-1 font-display">Resolution</p>
+                        <p className="text-[#0E241E] bg-[#FAF7F2] p-2.5 rounded-lg border-2 border-[#0E241E] text-[11px]">{resolutionReason}</p>
                       </div>
                     )}
                   </div>
@@ -301,9 +303,9 @@ export const EvidenceGraph: React.FC<Props> = ({ evidence, investigationId }) =>
               })()}
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center text-[#555] py-8">
-              <MapPin className="w-8 h-8 mb-2 stroke-[1.5]" />
-              <p className="text-xs italic font-serif">Select a node to inspect its evidence provenance.</p>
+            <div className="flex-1 flex flex-col items-center justify-center text-center text-[#5B756E] py-8">
+              <MapPin className="w-8 h-8 mb-2 text-[#DE4B39] stroke-[1.5]" />
+              <p className="text-xs italic">Select a node to inspect its evidence provenance.</p>
             </div>
           )}
         </div>
