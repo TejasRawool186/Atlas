@@ -66,3 +66,12 @@ function loadConfig(): AtlasConfig {
 }
 
 export const atlasConfig = loadConfig();
+
+/** Returns true when all critical services are configured */
+export function isFullyConfigured(): boolean {
+  return (
+    atlasConfig.geminiApiKey !== null &&
+    atlasConfig.sanity.isConfigured &&
+    !atlasConfig.certificate.isDefaultSecret
+  );
+}
