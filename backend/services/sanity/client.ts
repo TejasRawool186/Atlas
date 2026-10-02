@@ -321,9 +321,12 @@ export class SanityClient {
           }
           console.warn(`[SanityClient] Live Sanity mutation returned ${res.status}: ${errText}`);
         }
-      } catch (err) {
+      } catch (err: unknown) {
+        liveSanityError = err instanceof Error ? err.message : String(err);
         console.warn('[SanityClient] Live Sanity mutation failed, preserved in local corpus:', err);
       }
+    } else {
+      liveSanityError = 'SANITY_PROJECT_ID or SANITY_API_TOKEN is not configured.';
     }
 
     return {
