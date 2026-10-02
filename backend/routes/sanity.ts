@@ -158,6 +158,7 @@ sanityRouter.post('/ingest-url', async (req: Request, res: Response) => {
       entity: saved.entity,
       claims: saved.claims,
       liveSanityCreated: saved.liveSanityCreated,
+      liveSanityError: saved.liveSanityError,
       suggestedQuestions: finalDoc.suggestedQuestions,
     });
   } catch (err: unknown) {
