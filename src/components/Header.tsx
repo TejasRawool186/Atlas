@@ -35,21 +35,22 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="border-b-2 border-[#0E241E] bg-[#FAF7F2] sticky top-0 z-40 shadow-[0_4px_0_#0E241E] transition-colors">
-      {/* Main header row */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
-        {/* Brand */}
+      <div className="w-full max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6 py-2.5 flex items-center justify-between gap-3">
+        {/* Brand Logo & Title */}
         <div
           onClick={() => setActiveTab('landing')}
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-2.5 cursor-pointer group shrink-0"
           title="Go to Overview Landing Page"
         >
-          <div className="w-10 h-10 rounded-xl bg-[#DE4B39] border-2 border-[#0E241E] flex items-center justify-center shadow-[3px_3px_0_#0E241E] shrink-0 group-hover:-translate-y-0.5 transition-transform">
+          <div className="w-9 h-9 rounded-xl bg-[#DE4B39] border-2 border-[#0E241E] flex items-center justify-center shadow-[2px_2px_0_#0E241E] shrink-0 group-hover:-translate-y-0.5 transition-transform">
             <Shield className="w-5 h-5 text-white stroke-[2.5]" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-[#0E241E] leading-none font-display">ATLAS</h1>
-              <span className="text-[10px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-md border-2 border-[#0E241E] bg-[#DE4B39] text-white shadow-[2px_2px_0_#0E241E]">
+            <div className="flex items-center gap-1.5">
+              <h1 className="text-xl font-black tracking-tight text-[#0E241E] leading-none font-display">
+                ATLAS
+              </h1>
+              <span className="text-[9px] font-mono font-bold tracking-widest uppercase px-1.5 py-0.2 rounded-md border border-[#0E241E] bg-[#DE4B39] text-white shadow-[1px_1px_0_#0E241E]">
                 2026
               </span>
             </div>
@@ -67,9 +68,9 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Navigation & Action */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <nav className="flex items-center gap-1.5 flex-wrap">
+        {/* Navigation Tabs and Action */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <nav className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             {tabs.map(({ id, label, Icon }) => {
               const active = activeTab === id;
               return (
@@ -98,26 +99,25 @@ export const Header: React.FC<HeaderProps> = ({
             })}
           </nav>
 
+          {/* Add Topic Action Button */}
           {onOpenAddTopic && (
             <button
               onClick={onOpenAddTopic}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-[#F5A623] text-[#0E241E] border-2 border-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:-translate-y-px hover:shadow-[3px_3px_0_#0E241E] cursor-pointer font-display ml-1"
+              className="flex items-center gap-1.5 px-3 lg:px-3.5 py-1.5 rounded-xl text-[11px] lg:text-xs font-black uppercase tracking-wide bg-[#F5A623] hover:bg-[#E09612] text-[#0E241E] border-2 border-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#0E241E] transition-all cursor-pointer font-display shrink-0 ml-1"
               title="Ingest new article link or topic into Sanity"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
-              <span className="hidden sm:inline">Add Topic / URL</span>
-              <span className="sm:hidden">Add</span>
+              <span>Add Topic / URL</span>
             </button>
           )}
 
-          {activeTab !== 'console' && (
-            <button
-              onClick={() => setActiveTab('console')}
-              className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-[#2EC4B6] text-[#0E241E] border-2 border-[#0E241E] shadow-[2px_2px_0_#0E241E] hover:-translate-y-px hover:shadow-[3px_3px_0_#0E241E] cursor-pointer font-display ml-1"
-            >
-              <span>Audit Console</span>
-              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-            </button>
+          {/* Compact Sanity status chip (desktop) */}
+          {sanityConfig?.projectId && sanityConfig.projectId !== '(not configured)' && (
+            <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border-2 border-[#0E241E] text-[10px] font-mono font-bold text-[#0E241E] shadow-[2px_2px_0_#0E241E] shrink-0 ml-1">
+              <span className={`w-2 h-2 rounded-full border border-[#0E241E] ${sanityConnected ? 'bg-[#2EC4B6] animate-pulse' : 'bg-[#888]'}`} />
+              <span className="text-[#5B756E]">SANITY:</span>
+              <span>{sanityConfig.projectId}</span>
+            </div>
           )}
         </div>
       </div>
