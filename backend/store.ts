@@ -57,6 +57,15 @@ export class AtlasDataStore {
     );
   }
 
+  /**
+   * Returns true if an investigation is currently running.
+   */
+  public isRunning(invId: string): boolean {
+    const inv = this.investigations.get(invId);
+    if (!inv) return false;
+    return ['planning', 'retrieving', 'analyzing', 'auditing', 'certifying'].includes(inv.status);
+  }
+
   public subscribeToEvents(
     invId: string,
     listener: (event: InvestigationEvent) => void
