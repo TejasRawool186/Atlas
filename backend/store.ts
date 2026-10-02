@@ -66,6 +66,24 @@ export class AtlasDataStore {
     return ['planning', 'retrieving', 'analyzing', 'auditing', 'certifying'].includes(inv.status);
   }
 
+  /**
+   * Returns a count of investigations by verdict type.
+   */
+  public getVerdictSummary(): Record<string, number> {
+    const summary: Record<string, number> = {
+      SUPPORTED: 0,
+      PARTIALLY_SUPPORTED: 0,
+      CONTRADICTED: 0,
+      INSUFFICIENT_EVIDENCE: 0,
+      pending: 0,
+    };
+    for (const inv of this.investigations.values()) {
+      const key = inv.verdict ?? 'pending';
+      summary[key] = (summary[key] ?? 0) + 1;
+    }
+    return summary;
+  }
+
   public subscribeToEvents(
     invId: string,
     listener: (event: InvestigationEvent) => void
