@@ -65,7 +65,7 @@ export class AtlasInvestigationAgent {
   public async runWorkflow(
     investigationId: string,
     question: string,
-    onEvent?: (event: InvestigationEvent) => void
+    onEvent?: (event: InvestigationEvent, state?: InvestigationState) => void
   ): Promise<InvestigationState> {
     const state: InvestigationState = {
       investigationId,
@@ -92,7 +92,7 @@ export class AtlasInvestigationAgent {
     const emit = (type: string, data: Record<string, unknown>) => {
       const ev: InvestigationEvent = { type, timestamp: new Date().toISOString(), data };
       state.events.push(ev);
-      onEvent?.(ev);
+      onEvent?.(ev, state);
     };
 
     emit('investigation.created', { id: investigationId, question });
