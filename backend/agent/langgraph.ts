@@ -120,14 +120,16 @@ export class AtlasInvestigationAgent {
       const entityMap = new Map<string, SanityEntity>();
 
       for (const entityName of plan.identifiedEntities) {
-        for (const ent of sanityQueries.resolveEntities(entityName)) {
+        const resolved = await sanityQueries.resolveEntities(entityName);
+        for (const ent of resolved) {
           if (!entityMap.has(ent._id)) entityMap.set(ent._id, ent);
         }
       }
 
       // Broad fallback: search the full question if no entities found by keyword
       if (entityMap.size === 0) {
-        for (const ent of sanityQueries.resolveEntities(question)) {
+        const resolved = await sanityQueries.resolveEntities(question);
+        for (const ent of resolved) {
           if (!entityMap.has(ent._id)) entityMap.set(ent._id, ent);
         }
       }
@@ -142,7 +144,7 @@ export class AtlasInvestigationAgent {
       state.status = 'retrieving';
       state.currentStep = 'Sanity Context Retrieval';
 
-      const bundle = sanityQueries.executeInvestigationRetrieval(state.entities, question);
+      const bundle = await sanityQueries.executeInvestigationRetrieval(state.entities, question);
       state.claims = bundle.claims;
       state.sources = bundle.sources;
       state.relationships = bundle.relationships;

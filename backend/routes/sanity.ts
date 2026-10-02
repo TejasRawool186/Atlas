@@ -25,14 +25,14 @@ sanityRouter.get('/schema', (_req: Request, res: Response) => {
 });
 
 // GET /api/sanity/knowledge — Layer B knowledge docs
-sanityRouter.get('/knowledge', (_req: Request, res: Response) => {
-  const docs = sanityClient.getAllKnowledgeDocs();
+sanityRouter.get('/knowledge', async (_req: Request, res: Response) => {
+  const docs = await sanityClient.getAllKnowledgeDocs();
   res.json({ docs });
 });
 
 // GET /api/sanity/entities — Layer A entities
-sanityRouter.get('/entities', (_req: Request, res: Response) => {
-  const entities = corpusEngine.getAllEntities();
+sanityRouter.get('/entities', async (_req: Request, res: Response) => {
+  const entities = await sanityClient.findEntities('');
   res.json({ entities });
 });
 
