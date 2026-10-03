@@ -57,35 +57,60 @@ ATLAS addresses these failure modes through four core design decisions:
 
 ---
 
-## Architecture
+## Features
 
+### Ingestion and extraction
+- Fetches external web pages via HTTP, extracts text, and generates structured claims (`backend/services/sanity/extractor.ts`).
+- Writes entities, claims, and knowledge documents directly to the Sanity Content Lake or the local corpus.
+- Accepts guided form entries and raw JSON payloads for technical specifications and RFCs.
+
+### Knowledge retrieval and graph traversal
+- Executes batched GROQ queries (`subject._ref in $entityIds`) to retrieve claims across multiple entities in a single round-trip.
+- Traverses directed entity relationships (`introduced_in`, `supersedes`, `depends_on`, `implements`).
+- Falls back to a local in-memory corpus when external Sanity cloud credentials are not supplied.
+
+### Contradiction resolution
+- Compares claim pairs across subject, predicate, object, and validity intervals (`backend/agent/contradiction.ts`).
+- Skips intra-source statements to prevent false positive conflicts within the same document.
+- Resolves conflicts using source authority weights and timestamp precedence.
+
+### Epistemic auditing and verification
+- Executes 10 automated probes testing grounding, unsupported claims, contradictions, and counterfactual source removal (`backend/agent/auditor.ts`).
+- Assigns deterministic verdicts: `SUPPORTED`, `PARTIALLY_SUPPORTED`, `CONTRADICTED`, and `INSUFFICIENT_EVIDENCE`.
+- Renders an interactive topological SVG graph displaying entities, claims, sources, and conflict nodes (`src/components/EvidenceGraph.tsx`).
+
+### Cryptographic certification
+- Calculates deterministic SHA-256 leaf hashes for all evidence items (`backend/agent/certificate.ts`).
+- Computes a binary Merkle root and generates an HMAC-SHA256 signature.
+- Verifies stored certificates and detects evidence modification in an interactive sandbox.
+
+---
+
+## How it works
+
+The investigation pipeline runs sequentially across seven stages:
+
+1. **Question analysis**: The agent extracts intent, candidate entity tokens, and temporal bounds.
+2. **Schema discovery and entity resolution**: The agent queries Sanity to map identified names to canonical entity records.
+3. **Context retrieval**: A batched GROQ query retrieves all claims, sources, and relations referencing the resolved entities.
+4. **Contradiction evaluation**: The engine evaluates claim pairs, identifies contradictions, and applies authority weighting.
+5. **Answer synthesis**: Gemini generates a grounded response citing claim identifiers, or falls back to a structured summary if unavailable.
+6. **Adversarial audit**: The Lethe engine runs 10 probes against the answer and evidence set to compute a resilience score.
+7. **Certificate generation**: The engine computes a Merkle evidence root, signs the record, and broadcasts completion via Server-Sent Events.
+
+```mermaid
+flowchart TD
+    A[User Query] --> B[Question Analyzer]
+    B --> C[Entity Resolver & Schema Discovery]
+    C --> D[Sanity GROQ Query]
+    D --> E[Contradiction Engine]
+    E --> F[Evidence Aggregator]
+    F --> G[Answer Synthesis]
+    G --> H[10 Lethe Adversarial Probes]
+    H --> I[HMAC-SHA256 Merkle Certificate]
 ```
-User Question
-  ↓
-ATLAS LangGraph Agent
-  ├─ Question Analyzer
-  ├─ Entity Resolver
-  ├─ Sanity Context Retrieval ──→ Sanity Content Lake (Layer A)
-  │                            └→ Sanity Knowledge Base (Layer B)
-  ├─ Contradiction Engine
-  ├─ Evidence Aggregator
-  ├─ Answer Generator (Gemini / structured fallback)
-  ├─ Adversarial Auditor (10 Lethe Probes)
-  └─ Certificate Engine (HMAC-SHA256 Merkle)
-```
 
-See [`docs/architecture/system-architecture.md`](docs/architecture/system-architecture.md) for detail.
-
-## Sanity Integration
-
-ATLAS uses Sanity as the primary knowledge store:
-
-| Layer | Description |
-|-------|-------------|
-| **Layer A** | Structured Content Lake — Entity, Claim, Source, Relationship, Conflict, Version, Event documents queried via GROQ |
-| **Layer B** | Knowledge Base — sourced markdown documents (release notes, RFCs, changelogs) |
-
-The agent connects via the **Sanity Context MCP** endpoint. When `SANITY_PROJECT_ID` and `SANITY_API_TOKEN` are set, all queries hit the live Sanity Content Lake. Without credentials, ATLAS operates against a local corpus that mirrors the Sanity schema.
+---
 
 ## Setup
 
