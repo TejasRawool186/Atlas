@@ -69,10 +69,25 @@ export class ContradictionEngine {
         if (processedPairs.has(pairKey)) continue;
 
         if (c1.subject._ref === c2.subject._ref) {
+          // If claims share the same primary source, they co-exist in the same document and are not contradictions
+          const shareSource = Array.isArray(c1.sources) && Array.isArray(c2.sources) &&
+            c1.sources.some(s1 => c2.sources.some(s2 => s1?._ref && s1._ref === s2?._ref));
+          if (shareSource) continue;
+
+          // Non-exclusive predicates: multiple statements, features, or relations do not conflict
+          const NON_EXCLUSIVE_PREDICATES = new Set([
+            'stipulates', 'states', 'reports', 'mentions', 'describes', 'announces',
+            'features', 'contains', 'includes', 'supports', 'has_feature', 'implements',
+            'maintains', 'partners_with', 'employs', 'invests_in', 'launched_on', 'relates_to'
+          ]);
+          if (NON_EXCLUSIVE_PREDICATES.has(c1.predicate) && NON_EXCLUSIVE_PREDICATES.has(c2.predicate)) {
+            continue;
+          }
+
           // Check for opposing predicates or mutually exclusive objects
           const isDirectConflict =
-            (c1.predicate === 'introduced_in' && c2.predicate === 'conflicts_with') ||
-            (c1.predicate === 'introduced_in' && c2.predicate === 'deprecated_in') ||
+            (c1.predicate === 'introduced_in' && (c2.predicate === 'conflicts_with' || c2.predicate === 'deprecated_in')) ||
+            (c2.predicate === 'introduced_in' && (c1.predicate === 'conflicts_with' || c1.predicate === 'deprecated_in')) ||
             (c1.predicate === c2.predicate && JSON.stringify(c1.object) !== JSON.stringify(c2.object));
 
           if (isDirectConflict) {
