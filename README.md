@@ -1,6 +1,22 @@
-# ATLAS — AI Knowledge Integrity Auditor
+<div align="center">
 
-ATLAS is an autonomous knowledge-integrity platform that investigates factual questions by querying a Sanity-backed Content Lake and Knowledge Base, running adversarial audit probes, and producing tamper-evident cryptographic certificates.
+# ATLAS
+
+**Audit factual claims against structured knowledge with cryptographic verification.**
+
+ATLAS is an epistemic integrity auditor that validates factual assertions against relational schemas in Sanity, evaluates contradictions across sources, and seals the evidence into tamper-evident Merkle certificates.
+
+[![Node](https://img.shields.io/badge/node-v24.11.0-blue?style=flat-square)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/typescript-v7.0.2-blue?style=flat-square)](https://www.typescriptlang.org)
+[![Tests](https://img.shields.io/badge/tests-9%20passed-brightgreen?style=flat-square)](#testing)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](#license)
+[![Sanity](https://img.shields.io/badge/sanity-content%20lake-red?style=flat-square)](https://www.sanity.io)
+
+[Overview](#overview) • [How it works](#how-it-works) • [Tech stack](#tech-stack) • [Getting started](#getting-started) • [Testing](#testing)
+
+</div>
+
+---
 
 ## What It Does
 
