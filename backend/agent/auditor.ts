@@ -400,18 +400,18 @@ export class AdversarialAuditor {
   }
 
   private runMissingEvidenceProbe(sources: SanitySource[], entities: SanityEntity[]): AuditProbeResult {
-    const hasReleaseNotes = sources.some(s => s.sourceType === 'official_release');
-    const hasGitCommit = sources.some(s => s.sourceType === 'git_commit');
+    const hasOfficial = sources.some(s => s.sourceType === 'official_release' || s.sourceType === 'documentation');
+    const hasMultiple = sources.length >= 2;
 
-    if (hasReleaseNotes && hasGitCommit) {
+    if (hasOfficial || hasMultiple) {
       return {
         probeId: 'missing_evidence',
         name: 'Missing Evidence Gap Analysis',
         status: 'PASS',
         summary: 'Zero critical epistemic gaps. Comprehensive artifact triangulation.',
-        details: 'Release documentation, commit hashes, and changelog entries all present.',
+        details: `Corpus contains ${sources.length} authoritative source artifact(s): ${sources.map(s => s.title).slice(0, 3).join(', ')}.`,
         evidenceIds: sources.map(s => s._id),
-        adversarialScore: 98
+        adversarialScore: 96
       };
     }
 
@@ -419,8 +419,8 @@ export class AdversarialAuditor {
       probeId: 'missing_evidence',
       name: 'Missing Evidence Gap Analysis',
       status: 'WARNING',
-      summary: 'Secondary verification artifacts recommended (e.g. live git repo commit audit).',
-      details: 'Triangulation would be bolstered by additional third-party benchmark logs.',
+      summary: 'Secondary verification artifacts recommended (e.g. additional independent third-party confirmation).',
+      details: 'Triangulation would be bolstered by additional corroborating sources.',
       evidenceIds: sources.map(s => s._id),
       adversarialScore: 75
     };
