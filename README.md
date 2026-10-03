@@ -18,17 +18,25 @@ ATLAS is an epistemic integrity auditor that validates factual assertions agains
 
 ---
 
-## What It Does
+## Overview
 
-A user submits a question. ATLAS:
+ATLAS validates factual claims against structured source documents and generates an auditable cryptographic proof for every verdict. The system is designed for engineering, compliance, and research teams that require autonomous agents to produce citations linked to structured schemas rather than ungrounded completions. Standard retrieval engines pass unstructured text chunks to an LLM, making temporal conflicts and subtle hallucinations difficult to isolate. ATLAS replaces this pattern by structuring sources into entities, claims, and relations within the Sanity Content Lake, evaluating conflicts with explicit authority rules, and executing a 10-probe audit suite before issuing a verdict. Every completed investigation produces a deterministic HMAC-SHA256 Merkle certificate that can be verified independently to confirm that no evidence was altered.
 
-1. **Plans** — extracts entities and temporal constraints
-2. **Retrieves** — queries structured Sanity content (Layer A) and sourced knowledge documents (Layer B) via Sanity Context MCP
-3. **Resolves contradictions** — detects and resolves conflicting claims using source authority and temporal precedence
-4. **Builds an evidence graph** — topological graph of entities, claims, sources, relationships, and conflicts
-5. **Synthesizes an answer** — LLM-grounded response with source citations (or structured evidence summary when LLM is unavailable)
-6. **Audits** — runs the Lethe 10-probe adversarial protocol (grounding, contradiction, temporal consistency, source removal, inference detection, and more)
-7. **Certifies** — generates an HMAC-SHA256 Merkle certificate that cryptographically commits the evidence set
+---
+
+## Try it
+
+When running locally on `http://localhost:3000`, the workflow can be tested directly from the interface:
+
+1. Open the **Console** tab.
+2. Enter the claim: `India's current AI investment is $1.2B` and click **Run Audit**.
+3. Observe the live Server-Sent Events stream as the agent resolves entities, retrieves claims via GROQ, and runs the audit suite.
+4. Review the verdict badge (`SUPPORTED`), the 90/100 resilience score, and citations to `claim-muswyw17-0` and `src-muswyw15-ai-boom`.
+5. Enter a contradictory claim: `According to the article, did NVIDIA say that India's current AI investment is $1.2 billion and that the Union Budget provides a 10-year tax holiday for foreign companies?`
+6. Observe the `PARTIALLY_SUPPORTED` verdict, where the agent confirms the $1.2B figure but notes the budget established a 20-year holiday instead.
+7. Open the **Certificate** tab and click **Verify Cryptographic Proofs** to validate the SHA-256 Merkle root and signature.
+
+---
 
 ## Architecture
 
