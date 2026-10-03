@@ -80,18 +80,8 @@ export const sanityQueries = {
   ): Promise<AgentRetrievalBundle> {
     const entityIds = entities.map(e => e._id);
 
-    // Collect claims for all resolved entities
-    const claimIdsSeen = new Set<string>();
-    const resolvedClaims: SanityClaim[] = [];
-    for (const ent of entities) {
-      const claims = await sanityClient.getClaimsForEntity(ent._id);
-      for (const c of claims) {
-        if (!claimIdsSeen.has(c._id)) {
-          claimIdsSeen.add(c._id);
-          resolvedClaims.push(c);
-        }
-      }
-    }
+    // Collect claims for all resolved entities in a single batch query
+    const resolvedClaims = await sanityClient.getClaimsForEntities(entityIds);
 
     const relationships = await this.traverseRelationships(entityIds);
 
