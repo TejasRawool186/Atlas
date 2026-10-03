@@ -112,6 +112,36 @@ flowchart TD
 
 ---
 
+## Why this technology
+
+| Dimension | ATLAS (Structured Sanity + Verification) | Standard Vector RAG | Keyword Search |
+|---|---|---|---|
+| Contradiction handling | Deterministic scoring via source authority weights and timestamps | Blends conflicting text chunks into ambiguous prose | Cannot detect semantic contradictions |
+| Attribution precision | Exact claim ID and source URL per assertion | Approximate document chunk citations | Document-level URL matches only |
+| Offline operation | Bundled local corpus engine matching production schemas | Requires vector database instances | Requires local indexer |
+| Retrospective verification | Tamper-evident HMAC-SHA256 Merkle proof | None | None |
+| Query expressiveness | Relational GROQ queries join entities and claims | Semantic nearest-neighbor distance only | Exact token matching |
+| Tradeoff | Requires schema definitions and claim extraction upfront | Low ingestion setup cost | Zero schema configuration |
+
+---
+
+## Results
+
+Performance was measured by executing 100 consecutive runs of contradiction resolution, 10 Lethe adversarial probes, Merkle tree construction, and cryptographic verification on a clean local dataset (5 claims, 3 sources, 1 entity).
+
+- **Hardware**: AMD Ryzen 3 7330U (8 logical cores @ 2.30 GHz), 16 GB RAM
+- **Operating system**: Windows 11 (build 10.0.26200)
+- **Runtime**: Node.js v24.11.0
+
+| Stage | Mean Latency | Median (p50) | 95th Percentile (p95) |
+|---|---|---|---|
+| Adversarial Audit (10 Lethe Probes) | 0.028 ms | 0.012 ms | 0.108 ms |
+| Certificate Generation (Merkle Tree + HMAC) | 0.245 ms | 0.077 ms | 0.310 ms |
+| Certificate Verification (SHA-256 Re-root) | 0.056 ms | 0.030 ms | 0.121 ms |
+| Full Audit and Certification Pipeline | 0.364 ms | 0.137 ms | 0.644 ms |
+
+---
+
 ## Setup
 
 ### Prerequisites
