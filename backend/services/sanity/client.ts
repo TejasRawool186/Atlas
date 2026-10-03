@@ -107,8 +107,13 @@ export class SanityClient {
   // ─── Claims ───────────────────────────────────────────────────────────────
 
   public async getClaimsForEntity(entityId: string): Promise<SanityClaim[]> {
+    return this.getClaimsForEntities([entityId]);
+  }
+
+  public async getClaimsForEntities(entityIds: string[]): Promise<SanityClaim[]> {
+    if (entityIds.length === 0) return [];
     if (this.cfg.isConfigured) {
-      const groq = `*[_type == "claim" && (subject._ref == "${entityId}")]`;
+      const groq = `*[_type == "claim" && subject._ref in ${JSON.stringify(entityIds)}]`;
       try {
         const results = await this.queryStructuredContent(groq) as SanityClaim[];
         if (results && results.length > 0) return results;
@@ -116,7 +121,9 @@ export class SanityClient {
         // fall through to corpus
       }
     }
-    return corpusEngine.getClaimsForEntity(entityId);
+    const all = corpusEngine.getAllClaims();
+    const idSet = new Set(entityIds);
+    return all.filter(c => idSet.has(c.subject._ref));
   }
 
   public async getAllClaims(): Promise<SanityClaim[]> {
