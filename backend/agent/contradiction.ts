@@ -154,8 +154,50 @@ export class ContradictionEngine {
       };
     }
 
-    // Algorithmic resolution
-    if (sourceAuthorityWinner === 'A' && (temporalPrecedenceWinner === 'A' || temporalPrecedenceWinner === 'TIED')) {
+    // Status-based resolution: if one claim is active and the other is superseded or retracted
+    if (claimA.status === 'active' && (claimB.status === 'superseded' || claimB.status === 'retracted')) {
+      return {
+        id,
+        claimA,
+        claimB,
+        conflictType: 'TEMPORAL_CONFLICT',
+        status: 'RESOLVED',
+        resolutionSummary: `Claim A is active and supersedes Claim B (${claimB.status}).`,
+        resolutionSourceId: sourcesA[0]?._id,
+        resolutionReason: `Claim A is marked active in the authoritative content store, while Claim B is ${claimB.status}.`,
+        evidenceComparison: {
+          sourceA: sourcesA.map(s => s.title),
+          sourceB: sourcesB.map(s => s.title),
+          sourceAuthorityWinner: 'A',
+          temporalPrecedenceWinner: 'A',
+        },
+      };
+    } else if (claimB.status === 'active' && (claimA.status === 'superseded' || claimA.status === 'retracted')) {
+      return {
+        id,
+        claimA,
+        claimB,
+        conflictType: 'TEMPORAL_CONFLICT',
+        status: 'RESOLVED',
+        resolutionSummary: `Claim B is active and supersedes Claim A (${claimA.status}).`,
+        resolutionSourceId: sourcesB[0]?._id,
+        resolutionReason: `Claim B is marked active in the authoritative content store, while Claim A is ${claimA.status}.`,
+        evidenceComparison: {
+          sourceA: sourcesA.map(s => s.title),
+          sourceB: sourcesB.map(s => s.title),
+          sourceAuthorityWinner: 'B',
+          temporalPrecedenceWinner: 'B',
+        },
+      };
+    }
+
+    // Algorithmic resolution: higher authority or more recent source
+    const aWins = (sourceAuthorityWinner === 'A' && (temporalPrecedenceWinner === 'A' || temporalPrecedenceWinner === 'TIED')) ||
+                  (sourceAuthorityWinner === 'TIED' && temporalPrecedenceWinner === 'A');
+    const bWins = (sourceAuthorityWinner === 'B' && (temporalPrecedenceWinner === 'B' || temporalPrecedenceWinner === 'TIED')) ||
+                  (sourceAuthorityWinner === 'TIED' && temporalPrecedenceWinner === 'B');
+
+    if (aWins) {
       return {
         id,
         claimA,
@@ -164,7 +206,7 @@ export class ContradictionEngine {
         status: 'RESOLVED',
         resolutionSummary: `Claim A (${claimA.statement.slice(0, 40)}...) holds precedence.`,
         resolutionSourceId: sourcesA[0]?._id,
-        resolutionReason: `Claim A is backed by higher-authority evidence (${sourcesA[0]?.sourceType || 'official'}) published on ${sourcesA[0]?.publishedAt || 'recent date'}, superseding Claim B.`,
+        resolutionReason: `Claim A is backed by higher-authority or more recent evidence (${sourcesA[0]?.sourceType || 'official'}) published on ${sourcesA[0]?.publishedAt || 'recent date'}, superseding Claim B.`,
         evidenceComparison: {
           sourceA: sourcesA.map(s => s.title),
           sourceB: sourcesB.map(s => s.title),
@@ -172,7 +214,7 @@ export class ContradictionEngine {
           temporalPrecedenceWinner
         }
       };
-    } else if (sourceAuthorityWinner === 'B' && (temporalPrecedenceWinner === 'B' || temporalPrecedenceWinner === 'TIED')) {
+    } else if (bWins) {
       return {
         id,
         claimA,
@@ -181,7 +223,7 @@ export class ContradictionEngine {
         status: 'RESOLVED',
         resolutionSummary: `Claim B (${claimB.statement.slice(0, 40)}...) holds precedence.`,
         resolutionSourceId: sourcesB[0]?._id,
-        resolutionReason: `Claim B is backed by higher-authority evidence (${sourcesB[0]?.sourceType || 'official'}), superseding Claim A.`,
+        resolutionReason: `Claim B is backed by higher-authority or more recent evidence (${sourcesB[0]?.sourceType || 'official'}), superseding Claim A.`,
         evidenceComparison: {
           sourceA: sourcesA.map(s => s.title),
           sourceB: sourcesB.map(s => s.title),
