@@ -263,15 +263,151 @@ curl -X POST http://localhost:3000/api/sanity/ingest-url \
 
 ---
 
-## Hackathon — Sanity Challenge (Path One)
+## Guarantees
 
-ATLAS demonstrates meaningful Sanity usage by:
+| Guarantee | Enforcement Mechanism | Source Reference |
+|---|---|---|
+| Unaltered evidence detection | Recomputing SHA-256 Merkle root from leaves fails on modified text | `backend/agent/certificate.ts` |
+| Non-repudiation of verdict | HMAC-SHA256 signs investigation ID, verdict, Merkle root, and timestamp | `backend/agent/certificate.ts` |
+| Bounded hallucination | Unsupported Claims probe fails if proposition lacks backing claim reference | `backend/agent/auditor.ts` |
+| Source authority hierarchy | Official releases outrank forum posts during contradiction evaluation | `backend/agent/contradiction.ts` |
+| Offline operation | Queries fall back to in-memory corpus when cloud credentials are absent | `backend/services/sanity/client.ts` |
 
-- Using Sanity as the **authoritative knowledge store** (not a peripheral cache)
-- Running **GROQ queries** against structured Layer A content
-- Querying the **Sanity Context MCP** endpoint for schema discovery and Knowledge Base retrieval
-- Constructing a **knowledge graph** from Sanity entities, claims, and relationships
-- Detecting **contradictions** between Sanity claims and resolving them with source authority
-- Generating **Merkle-certified audit reports** that commit the Sanity-retrieved evidence
+---
 
-The Sanity Project ID and dataset are configurable via environment variables and displayed in the Sanity Explorer tab.
+## Testing
+
+The test suite runs using Node's built-in test runner via `tsx`.
+
+```bash
+npm test
+```
+
+Real execution output:
+
+```
+# Subtest: AdversarialAuditor (Lethe Probes)
+  ok 1 - runs all 10 probes and assigns SUPPORTED verdict when fully grounded
+  ok 2 - assigns INSUFFICIENT_EVIDENCE verdict when evidence is missing
+ok 1 - AdversarialAuditor (Lethe Probes)
+
+# Subtest: CertificateEngine
+  ok 1 - generates deterministic Merkle evidence root and valid HMAC signature
+  ok 2 - detects tampered claim payload and invalidates Merkle proof
+ok 2 - CertificateEngine
+
+# Subtest: ContradictionEngine
+  ok 1 - resolves conflict in favor of higher source authority
+  ok 2 - skips intra-source co-occurring statements
+ok 3 - ContradictionEngine
+
+# Subtest: CorpusEngine (Sanity Mirror)
+  ok 1 - discovers all registered Sanity schemas
+  ok 2 - resolves entities by text search query
+  ok 3 - executes GROQ filter queries against local store
+ok 4 - CorpusEngine (Sanity Mirror)
+
+# tests 9
+# suites 4
+# pass 9
+# fail 0
+# duration_ms 720.5912
+```
+
+To run TypeScript verification across the codebase:
+
+```bash
+npm run typecheck
+```
+
+---
+
+## Project structure
+
+```
+atlas/
+├── backend/                           # Server application code
+│   ├── agent/                         # LangGraph state machine and core engines
+│   │   ├── auditor.ts                 # 10-probe Lethe adversarial verification suite
+│   │   ├── certificate.ts             # RFC-6962 Merkle tree and HMAC-SHA256 signing
+│   │   ├── contradiction.ts           # Conflict discovery and authority weighting
+│   │   ├── evidence.ts                # Evidence bundling and graph normalization
+│   │   └── langgraph.ts               # Investigation state machine orchestrator
+│   ├── config/                        # Environment parsing and typed config
+│   │   └── env.ts
+│   ├── llm/                           # Gemini SDK provider with structured fallback
+│   │   └── provider.ts
+│   ├── routes/                        # Express HTTP and SSE route handlers
+│   │   ├── certificates.ts            # Verification endpoints
+│   │   ├── investigations.ts          # Run triggers and SSE event streams
+│   │   ├── sanity.ts                  # Schema discovery, GROQ runner, topic ingestion
+│   │   └── system.ts                  # System health endpoints
+│   ├── services/                      # Knowledge lake integrations
+│   │   └── sanity/
+│   │       ├── client.ts              # Live Sanity HTTP client with fallback
+│   │       ├── corpus.ts              # Local in-memory corpus and seed data
+│   │       ├── extractor.ts           # Webpage fetcher and atomic claim extractor
+│   │       ├── queries.ts             # Batched GROQ queries and entity resolution
+│   │       └── types.ts               # Shared TypeScript interfaces for Sanity
+│   └── store.ts                       # In-memory investigation state repository
+├── sanity-studio/                     # Sanity Studio management dashboard
+│   ├── schemaTypes/                   # TypeScript schemas for Lake documents
+│   │   ├── claim.ts                   # Atomic proposition schema
+│   │   ├── conflict.ts                # Disputed assertion schema
+│   │   ├── entity.ts                  # Canonical entity record schema
+│   │   ├── knowledge_doc.ts           # Full-text knowledge document schema
+│   │   └── source.ts                  # Authoritative source schema
+│   ├── sanity.cli.ts                  # Sanity CLI config
+│   └── sanity.config.ts               # Studio project configuration
+├── src/                               # Frontend application code
+│   ├── components/                    # React UI components
+│   │   ├── AddTopicModal.tsx          # URL and manual topic ingestion dialog
+│   │   ├── ArchitectureView.tsx       # System architecture diagram view
+│   │   ├── AuditMatrix.tsx            # Lethe probe results and score matrix
+│   │   ├── CertificateVerifier.tsx    # Interactive cryptographic verifier and sandbox
+│   │   ├── EvidenceGraph.tsx          # Topological SVG evidence graph view
+│   │   ├── Header.tsx                 # Navigation bar and system status indicator
+│   │   ├── InvestigationConsole.tsx   # Live execution trace and query runner
+│   │   ├── LandingPage.tsx            # Product overview and benchmark cases
+│   │   └── SanityExplorer.tsx         # In-app GROQ query runner and schema browser
+│   ├── api.ts                         # Client-side API caller
+│   ├── App.tsx                        # Root layout and tab navigation
+│   ├── index.css                      # Tailwind stylesheet and theme variables
+│   └── types.ts                       # Frontend TypeScript type declarations
+├── test/                              # Automated unit tests
+│   ├── auditor.test.ts                # Probe execution and verdict evaluation
+│   ├── certificate.test.ts            # Merkle tree and tamper verification
+│   ├── contradiction.test.ts          # Authority weighting and conflict resolution
+│   └── corpus.test.ts                 # Schema discovery and GROQ filtering
+├── scripts/                           # Utility and benchmark scripts
+│   └── benchmark.ts                   # Latency measurement script
+├── package.json                       # Dependency definitions and scripts
+├── server.ts                          # Node.js entry point integrating Vite
+├── tsconfig.json                      # Compiler options
+└── vite.config.ts                     # Bundler configuration
+```
+
+---
+
+## Limitations
+
+- **Sanity token permissions**: The Sanity HTTP Mutation API requires a token with Editor permissions to persist newly ingested topics to the cloud Content Lake. With a Viewer token, reads and GROQ queries function normally, but writes remain local to the in-memory engine.
+- **Web scraping scope**: Webpage ingestion in `backend/services/sanity/extractor.ts` uses plain HTTP requests. Sites protected by CAPTCHAs, bot blocks, or heavy client-side JavaScript rendering cannot be extracted directly without headless browser preprocessing.
+- **Investigation volatility**: Investigation records and event histories are stored in an in-memory repository (`backend/store.ts`). Restarting the server resets active investigation logs, though documents saved to Sanity remain persistent.
+
+---
+
+## Roadmap
+
+- Real-time webhook subscription to automatically update the local cache when documents change in the Sanity Content Lake.
+- Bi-directional Sanity Studio input component to run Lethe audit probes directly inside the publishing workflow.
+- Playwright-based URL extraction pipeline for client-side single-page applications and authenticated documentation.
+- Export of verification proofs to standard JSON-LD and decentralized transparency logs.
+
+---
+
+## Contributing and license
+
+Contributions are welcome. Please open an issue to discuss proposed changes or submit a pull request with unit tests covering any new capabilities.
+
+This project is licensed under the MIT License.
