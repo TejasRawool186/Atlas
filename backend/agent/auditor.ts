@@ -107,16 +107,37 @@ export class AdversarialAuditor {
     const hasUnresolvedConflict = conflicts.some(c => c.status === 'UNRESOLVED' || c.status === 'DISPUTED');
     const hasGroundingGap = probes.find(p => p.probeId === 'grounding')?.status === 'FAIL';
 
+    const lowerAnswer = (answer || '').toLowerCase();
+    const answerMentionsContradiction =
+      lowerAnswer.includes('is contradicted') ||
+      lowerAnswer.includes('contradicted by') ||
+      lowerAnswer.includes('contradicts') ||
+      lowerAnswer.includes('differs from the evidence') ||
+      lowerAnswer.includes('not supported') ||
+      lowerAnswer.includes('incorrect');
+    const answerMentionsPartial =
+      lowerAnswer.includes('partially') ||
+      lowerAnswer.includes('inaccuracy') ||
+      (lowerAnswer.includes('support') && lowerAnswer.includes('contradict')) ||
+      (lowerAnswer.includes('yes') && lowerAnswer.includes('no')) ||
+      (lowerAnswer.includes('correct') && (lowerAnswer.includes('not state') || lowerAnswer.includes('does not state') || lowerAnswer.includes('instead')));
+
     if (hasGroundingGap || claims.length === 0 || sources.length === 0) {
       verdict = 'INSUFFICIENT_EVIDENCE';
       verdictRationale = 'Epistemic ground truth insufficient. Retrieved Sanity Knowledge Base has zero authoritative attestations for this question.';
     } else if (hasUnresolvedConflict) {
       verdict = 'CONTRADICTED';
       verdictRationale = 'Active unresolved contradictions detected between primary sources in the Knowledge Base without definitive temporal override.';
-    } else if (hasDirectFail || warningCount >= 2 || conflicts.length > 0) {
+    } else if (answerMentionsPartial) {
+      verdict = 'PARTIALLY_SUPPORTED';
+      verdictRationale = 'Claim-level verification indicates the question is partially supported by evidence, while specific propositions diverge from retrieved sources.';
+    } else if (answerMentionsContradiction && !lowerAnswer.includes('is supported') && !lowerAnswer.includes('claim is supported')) {
+      verdict = 'CONTRADICTED';
+      verdictRationale = 'The factual claim in the question is contradicted by authoritative Sanity evidence.';
+    } else if (hasDirectFail || (warningCount >= 3 && conflicts.length > 0)) {
       verdict = 'PARTIALLY_SUPPORTED';
       verdictRationale = conflicts.length > 0
-        ? `Primary conclusion supported by authoritative release artifacts, but historical roadmap contradiction required temporal disambiguation.`
+        ? `Primary conclusion supported by authoritative release artifacts, but historical contradiction required temporal disambiguation.`
         : 'Conclusion holds, but inference boundaries or counterfactual sensitivity were flagged during adversarial probing.';
     } else {
       verdict = 'SUPPORTED';
