@@ -215,11 +215,11 @@ export class AdversarialAuditor {
     return {
       probeId: 'contradiction',
       name: 'Contradiction Probe',
-      status: 'WARNING',
-      summary: 'Conflicting historical source identified and chronologically resolved.',
-      details: `Detected conflicting historical documentation (e.g. outdated roadmap draft). Successfully resolved by authoritative release notes (${conflicts[0].resolutionReason}).`,
+      status: 'PASS',
+      summary: `${conflicts.length} historical or competing source(s) identified and chronologically/authoritatively resolved.`,
+      details: conflicts.map(c => `${c.conflictType}: ${c.resolutionReason}`).join('; '),
       evidenceIds: conflicts.map(c => c.id),
-      adversarialScore: 78
+      adversarialScore: 92
     };
   }
 
@@ -363,14 +363,17 @@ export class AdversarialAuditor {
 
   private runAlternateInterpretationProbe(conflicts: EvaluatedConflict[], claims: SanityClaim[]): AuditProbeResult {
     if (conflicts.length > 0) {
+      const allResolved = conflicts.every(c => c.status === 'RESOLVED');
       return {
         probeId: 'alternate_interpretation',
         name: 'Alternate Interpretation Robustness',
-        status: 'WARNING',
-        summary: 'Alternate hypothesis (feature delay) is historically documented in obsolete proposals.',
-        details: 'While the roadmap draft favored delay, the git merge commit and official release artifact mathematically refute the alternate hypothesis.',
+        status: allResolved ? 'PASS' : 'WARNING',
+        summary: allResolved
+          ? 'Alternate hypothesis identified and satisfactorily resolved with authoritative evidence.'
+          : 'Alternate interpretation remains under active dispute across retrieved sources.',
+        details: conflicts.map(c => `${c.conflictType}: ${c.resolutionReason}`).join(' | '),
         evidenceIds: conflicts.map(c => c.id),
-        adversarialScore: 82
+        adversarialScore: allResolved ? 88 : 65
       };
     }
 
