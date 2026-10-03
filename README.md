@@ -142,68 +142,126 @@ Performance was measured by executing 100 consecutive runs of contradiction reso
 
 ---
 
-## Setup
+## Tech stack
+
+| Layer | Technology | Version | Purpose |
+|---|---|---|---|
+| Runtime | Node.js | v24.11.0 | Server execution environment |
+| Server | Express | 4.21.2 | REST API and Server-Sent Events router |
+| Client | React | 19.0.1 | User interface component library |
+| Bundler | Vite | 8.3.1 | Frontend build tool and middleware |
+| Type system | TypeScript | 7.0.2 | Static typing for client and server code |
+| CSS engine | Tailwind CSS | 4.3.3 | Theme styling and responsive utilities |
+| Knowledge store | Sanity Content Lake | HTTP API 2024-01-01 | Cloud-hosted structured JSON document lake |
+| Query engine | GROQ | Native Sanity | Graph-relational queries across entities and claims |
+| Reasoning model | Google GenAI SDK | 2.4.0 | Language model provider (`gemini-2.5-flash`) |
+| Cryptography | Node.js Crypto | Native | SHA-256 Merkle tree leaves and HMAC-SHA256 signing |
+
+---
+
+## Getting started
 
 ### Prerequisites
+- Node.js 20.0.0 or higher (verified on Node.js v24.11.0)
+- npm 10.0.0 or higher
+- Optional: Gemini API key for LLM answer synthesis
+- Optional: Sanity project ID and API token for remote Content Lake persistence
 
-- Node.js 20+
-- A Sanity project (for live mode) — create one at [sanity.io/manage](https://www.sanity.io/manage)
-- A Gemini API key (for LLM answer synthesis) — obtain at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
-
-### Installation
+### Quick start
 
 ```bash
-git clone <repo>
-cd atlas
+git clone https://github.com/TejasRawool186/Atlas.git
+cd Atlas
 npm install
-cp .env.example .env
-# edit .env with your credentials
-```
-
-### Environment Variables
-
-See [`.env.example`](.env.example) for all variables. Required for full functionality:
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `GEMINI_API_KEY` | For LLM synthesis | Gemini API key |
-| `SANITY_PROJECT_ID` | For live Sanity | Your Sanity project ID |
-| `SANITY_DATASET` | For live Sanity | Dataset name (default: `production`) |
-| `SANITY_API_TOKEN` | For live Sanity | Read token from Sanity manage |
-| `CERTIFICATE_HMAC_SECRET` | For certificates | Random 32-byte hex string |
-
-### Development
-
-```bash
 npm run dev
 ```
 
-Starts the Express server with Vite middleware on `http://localhost:3000`.
+The application will start on `http://localhost:3000` with the local corpus loaded.
 
-### Production Build
+### Manual setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/TejasRawool186/Atlas.git
+   cd Atlas
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Copy the sample environment file:
+   ```bash
+   cp .env.example .env
+   ```
+4. Configure required variables in `.env`:
+   ```env
+   PORT=3000
+   NODE_ENV=development
+   CERTIFICATE_HMAC_SECRET=replace_with_32_byte_hex_secret
+   ```
+5. Start the server:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## Configuration
+
+All configuration is managed through environment variables loaded via `dotenv` in `backend/config/env.ts`.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` | `3000` | Port on which the Express server binds |
+| `NODE_ENV` | `development` | Environment mode (`development` uses Vite middleware; `production` serves static files) |
+| `APP_URL` | `http://localhost:3000` | Base URL used for self-referential links |
+| `GEMINI_API_KEY` | `""` | API key for Gemini reasoning models; if omitted, structured claim fallbacks are used |
+| `SANITY_PROJECT_ID` | `""` | Sanity project identifier; if omitted, the local in-memory corpus is used |
+| `SANITY_DATASET` | `production` | Target dataset name within the Sanity project |
+| `SANITY_API_VERSION` | `2024-01-01` | Sanity HTTP API version string |
+| `SANITY_API_TOKEN` | `""` | Token for Sanity HTTP queries; Editor permissions required for mutations |
+| `SANITY_CONTEXT_URL` | `https://mcp.sanity.io/v1/context` | Endpoint for Sanity Context MCP operations |
+| `CERTIFICATE_HMAC_SECRET` | `atlas-default-insecure-secret` | Key used to sign and verify HMAC-SHA256 evidence certificates |
+
+---
+
+## Usage
+
+### Ingesting an external article
 
 ```bash
-npm run build
-NODE_ENV=production npm start
+curl -X POST http://localhost:3000/api/sanity/ingest-url \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/press-release",
+    "docType": "release_notes"
+  }'
 ```
 
-### Type Check
+### Running an investigation
 
-```bash
-npm run typecheck
-```
+1. Create the investigation record:
+   ```bash
+   curl -X POST http://localhost:3000/api/investigations \
+     -H "Content-Type: application/json" \
+     -d '{"question": "India current AI investment is $1.2B"}'
+   ```
+   Response:
+   ```json
+   {"id": "INV-2026-10492", "status": "created"}
+   ```
 
-## Documentation
+2. Trigger the agent execution:
+   ```bash
+   curl -X POST http://localhost:3000/api/investigations/INV-2026-10492/run
+   ```
 
-| Path | Contents |
-|------|----------|
-| [`docs/architecture/`](docs/architecture/) | System architecture, investigation flow, evidence model |
-| [`docs/api/`](docs/api/) | REST API reference, SSE events |
-| [`docs/agents/`](docs/agents/) | LangGraph workflow, audit probes, certificate engine |
-| [`docs/sanity/`](docs/sanity/) | Sanity schemas, knowledge base, MCP integration |
-| [`docs/frontend/`](docs/frontend/) | Frontend architecture |
-| [`docs/deployment/`](docs/deployment/) | Environment setup, production deployment |
-| [`docs/hackathon/`](docs/hackathon/) | Sanity Challenge submission notes |
+3. Retrieve the final audit report:
+   ```bash
+   curl http://localhost:3000/api/investigations/INV-2026-10492/audit
+   ```
+
+---
 
 ## Hackathon — Sanity Challenge (Path One)
 
